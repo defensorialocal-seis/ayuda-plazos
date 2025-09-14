@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscador de Plazos Legales</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .main-container {
+            width: 100%;
+            max-width: 900px;
+            background: #fff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        #searchButton, #printButton {
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        #searchButton:hover, #printButton:hover {
+            background-color: #2980b9;
+        }
+
+        #searchButton:active, #printButton:active {
+            transform: scale(0.98);
+        }
+
+        #printButton {
+            background-color: #2ecc71;
+        }
+
+        #printButton:hover {
+            background-color: #27ae60;
+        }
+
+        .modules-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .module {
+            flex: 1 1 250px;
+            background: linear-gradient(135deg, #f4f4f9, #e9e9f2);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .module.ley-xii {
+            background: linear-gradient(135deg, #0056b3, #007bff);
+            color: white;
+        }
+
+        .module.ccyc {
+            background: linear-gradient(135deg, #4CAF50, #8bc34a);
+            color: white;
+        }
+        
+        .module.cpccn {
+            background: linear-gradient(135deg, #f77f00, #fcbf49);
+            color: white;
+        }
+
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        .result-group {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background-color: #fafafa;
+        }
+
+        .result-group h2 {
+            margin-top: 0;
+            color: #34495e;
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .result-item {
+            border-bottom: 1px dashed #e0e0e0;
+            padding: 10px 0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .result-item p {
+            margin: 5px 0;
+        }
+        
+        .result-item strong {
+            color: #34495e;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 800px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #333;
+        }
+
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="main-container">
+        <h1>Buscador de Plazos Legales</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Buscar por concepto, plazo o artículo...">
+            <button id="searchButton">Buscar</button>
+            <button id="printButton">Imprimir Resultados</button>
+        </div>
+
+        <div class="modules-container">
+            <div class="module ley-xii" data-modal="ley-xii-modal">
+                Ley XII - N.º 27 (Misiones)
+            </div>
+            <div class="module ccyc" data-modal="ccyc-modal">
+                Código Civil y Comercial de la Nación
+            </div>
+            <div class="module cpccn" data-modal="cpccn-modal">
+                Código Procesal Civil y Comercial de la Nación
+            </div>
+        </div>
+
+        <div id="results">
+            </div>
+    </div>
+
+    <div id="ley-xii-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Ley XII - N.º 27 (Misiones)</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Artículo</th>
+                            <th>Acción/Evento</th>
+                            <th>Plazo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ley-xii-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="ccyc-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Código Civil y Comercial de la Nación</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concepto/Acto</th>
+                            <th>Plazo</th>
+                            <th>Artículo/Fuente</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ccyc-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="cpccn-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Código Procesal Civil y Comercial de la Nación</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Artículo</th>
+                            <th>Plazo Establecido</th>
+                            <th>Contexto / Descripción del Plazo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cpccn-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Datos combinados de los archivos subidos
+        const data = {
+            "Ley XII - N.º 27 (Misiones)": [
+                { "articulo": "11", "concepto": "Tribunal superior resuelve contienda de inhibitoria", "plazo": "5 días" },
+                { "articulo": "", "concepto": "Intimar remisión de actuaciones", "plazo": "10 a 15 días" },
+                { "articulo": "14", "concepto": "Actor recusa sin expresión de causa al Juez subrogante", "plazo": "5 días" },
+                { "articulo": "16", "concepto": "Recusación sin expresión de causa", "plazo": "No suspende los plazos" },
+                { "articulo": "18", "concepto": "Recusación con expresión de causa sobreviniente (desde conocimiento)", "plazo": "10 días (con ampliación según Artículo 159)" },
+                { "articulo": "24", "concepto": "Oportunidades para presentación de recusación", "plazo": "Ver Artículo 14" },
+                { "articulo": "25", "concepto": "Incidente de prueba se recibe / Resolver incidente de prueba", "plazo": "5 días" },
+                { "articulo": "26", "concepto": "Jueces de primera instancia remiten escrito de recusación e informe a la Cámara de Apelaciones", "plazo": "5 días" },
+                { "articulo": "34", "concepto": "Jueces dictan providencias simples", "plazo": "3 días" },
+                { "articulo": "34", "concepto": "Jueces dictan sentencias definitivas en juicio ordinario", "plazo": "40 o 60 días" },
+                { "articulo": "34", "concepto": "Jueces dictan sentencias definitivas en juicio sumarísimo", "plazo": "15 o 20 días (u 10 o 15 días en otros supuestos)" },
+                { "articulo": "34", "concepto": "Jueces dictan sentencias interlocutorias y homologatorias", "plazo": "10 o 15 días" },
+                { "articulo": "35", "concepto": "Falta de ejecución de multas (desde que queda firme la resolución)", "plazo": "30 días" },
+                { "articulo": "36", "concepto": "Vencimiento de un plazo", "plazo": "Se pasa a la etapa siguiente" },
+                { "articulo": "38", "concepto": "Secretarios firman providencias de mero trámite", "plazo": "Observar plazo del Artículo 34, inc. 3, subinc. a)" },
+                { "articulo": "43", "concepto": "Partes requieren al Juez que deje sin efecto lo dispuesto por Secretario u Oficial Primero", "plazo": "3 días" },
+                { "articulo": "46", "concepto": "Apercibimiento (involucra fijación de un plazo)", "plazo": "Plazo a fijar" },
+                { "articulo": "", "concepto": "Acompañar documento que justifica la representación", "plazo": "Hasta 20 días" },
+                { "articulo": "48", "concepto": "Gestor acompaña instrumentos que acreditan personalidad o ratifica gestión (desde la primera presentación)", "plazo": "40 días hábiles" },
+                { "articulo": "53", "concepto": "Apoderado continúa gestiones en caso de renuncia hasta que el Juez fije plazo al poderdante", "plazo": "Plazo a fijar" },
+                { "articulo": "53", "concepto": "Juez señala plazo para que interesados concurran a estar a derecho (en caso de muerte o incapacidad del poderdante)", "plazo": "Plazo a señalar" },
+                { "articulo": "53", "concepto": "Mandatario informa al Juez o Tribunal el deceso o incapacidad del poderdante (desde conocimiento)", "plazo": "10 días" },
+                { "articulo": "53", "concepto": "Mandante comparece por sí o por nuevo apoderado (en caso de muerte o inhabilidad del apoderado)", "plazo": "Plazo a fijar" },
+                { "articulo": "54", "concepto": "Audiencia para unificación de la representación", "plazo": "Dentro de 10 días" },
+                { "articulo": "57", "concepto": "Suplir omisión de firma de letrado en escrito (desde notificada la providencia)", "plazo": "2º día" },
+                { "articulo": "59", "concepto": "Citación del demandado", "plazo": "Plazo de la citación" },
+                { "articulo": "70", "concepto": "Vencido se allana (desde conocimiento de títulos e instrumentos tardíamente presentados)", "plazo": "5º día" },
+                { "articulo": "81", "concepto": "Traslado (a peticionario, otra parte y organismo de recaudación de tasa de justicia después de producida la prueba)", "plazo": "5 días comunes" },
+                { "articulo": "81", "concepto": "Exención de pago de impuestos y sellado de actuación", "plazo": "Hasta que se dicte resolución en solicitud de beneficio de litigar sin gastos" },
+                { "articulo": "83", "concepto": "Juez ordena la integración de la litis", "plazo": "Plazo que señala" },
+                { "articulo": "89", "concepto": "Resolución sobre pedido de intervención", "plazo": "Dentro de 10 días" },
+                { "articulo": "92", "concepto": "Demandado solicita citación de tercero", "plazo": "Dentro del plazo para contestar la demanda" },
+                { "articulo": "94", "concepto": "Suspensión del procedimiento por citación de tercero", "plazo": "Hasta su comparecencia o vencimiento del plazo señalado para comparecer" },
+                { "articulo": "97", "concepto": "Tercería de dominio se deduce", "plazo": "Antes de que se otorgue la posesión de los bienes" },
+                { "articulo": "97", "concepto": "Tercería de mejor derecho se deduce", "plazo": "Antes de que se pague al acreedor" },
+                { "articulo": "97", "concepto": "Deducir tercería (después de conocer el embargo)", "plazo": "Después de 10 días (abonar costas)" },
+                { "articulo": "110", "concepto": "Citado pretende citar a su causante (desde notificado)", "plazo": "Primeros 5 días" },
+                { "articulo": "110", "concepto": "Citar al deudor (antes de conferirse traslado al demandado)", "plazo": "10 días" },
+                { "articulo": "112", "concepto": "Suplir omisión de acompañar copias de escrito o documento", "plazo": "5 días" },
+                { "articulo": "112", "concepto": "Conservación de copias", "plazo": "Plazos establecidos por reglamentación de superintendencia" },
+                { "articulo": "121", "concepto": "Entregar escritos que venzan un plazo", "plazo": "Dentro de las 2 primeras horas del despacho del día hábil inmediato" },
+                { "articulo": "125", "concepto": "Señalar audiencias", "plazo": "Con anticipación no menor de 3 días" },
+                { "articulo": "125", "concepto": "Espera de los citados en audiencia", "plazo": "30 minutos" },
+                { "articulo": "126", "concepto": "Juez fija plazo para devolución de expedientes", "plazo": "Plazo a fijar" },
+                { "articulo": "128", "concepto": "Retardo en devolución de expediente (vencido el plazo)", "plazo": "Multa por cada día de retardo" },
+                { "articulo": "129", "concepto": "Intimar a la parte actora a presentar copias para reconstrucción de expediente", "plazo": "5 días" },
+                { "articulo": "130", "concepto": "Notificación de resoluciones judiciales", "plazo": "Días martes y viernes, o el siguiente hábil" },
+                { "articulo": "134", "concepto": "Realizar notificaciones personales o por cédula (si el afectado no toma conocimiento)", "plazo": "3 días" },
+                { "articulo": "136", "concepto": "Funcionarios judiciales devuelven expediente", "plazo": "Dentro del 3º día" },
+                { "articulo": "141", "concepto": "Oficina de notificaciones diligencia y devuelve cédula", "plazo": "En la forma y plazos de reglamentación de superintendencia" },
+                { "articulo": "145", "concepto": "Gastos de notificación por radiodifusión", "plazo": "Último párrafo del Artículo 145" },
+                { "articulo": "149", "concepto": "Resolución se tiene por notificada", "plazo": "Al día siguiente de la última publicación de edictos" },
+                { "articulo": "150", "concepto": "Resolución se tiene por notificada", "plazo": "Al día siguiente de la última transmisión radiofónica" },
+                { "articulo": "151", "concepto": "Notificación surte efectos", "plazo": "Desde que la parte tuvo conocimiento de la resolución" },
+                { "articulo": "152", "concepto": "Plazo para contestar vistas y traslados", "plazo": "5 días (salvo disposición en contrario)" },
+                { "articulo": "153", "concepto": "Días y horas hábiles", "plazo": "Definidos" },
+                { "articulo": "154", "concepto": "Jueces y tribunales habilitan días y horas", "plazo": "Cuando no es posible señalar audiencias dentro del plazo establecido" },
+                { "articulo": "156", "concepto": "Plazos legales o judiciales", "plazo": "Son perentorios y pueden prorrogarse por acuerdo de partes" },
+                { "articulo": "", "concepto": "Juez señala plazo (si el Código no lo fija expresamente)", "plazo": "Plazo a señalar" },
+                { "articulo": "157", "concepto": "Plazos empiezan a correr", "plazo": "Desde la notificación (o desde la última si son comunes), sin contar día de diligencia ni inhábiles" },
+                { "articulo": "158", "concepto": "Apoderados acuerdan suspensión de plazos", "plazo": "No mayor de 20 días sin conformidad de mandantes" },
+                { "articulo": "158", "concepto": "Partes acuerdan abreviación de un plazo", "plazo": "Abreviación acordada" },
+                { "articulo": "158", "concepto": "Jueces pueden declarar interrupción o suspensión de plazos", "plazo": "Interrupción o suspensión" },
+                { "articulo": "159", "concepto": "Ampliación de plazos para diligencias fuera del asiento del Juzgado", "plazo": "1 día por cada 200 kilómetros o fracción" },
+                { "articulo": "160", "concepto": "Ministerio Público y funcionarios sometidos a reglas de plazos", "plazo": "Reglas de los plazos" },
+                { "articulo": "167", "concepto": "Corrección de errores materiales o aclaraciones a la sentencia (a pedido de parte)", "plazo": "3 días de la notificación" },
+                { "articulo": "168", "concepto": "Juez o Tribunal informa a Cámara de Apelaciones o Superior Tribunal de Justicia (imposibilidad de pronunciar sentencia)", "plazo": "10 días de anticipación al vencimiento en juicio ordinario; 5 días en los demás casos" },
+                { "articulo": "171", "concepto": "Promover incidente de nulidad (desde conocido el acto)", "plazo": "5 días" },
+                { "articulo": "173", "concepto": "Pedido de nulidad tramita por incidente", "plazo": "Aplicando normas de Artículos 173 y 174" },
+                { "articulo": "181", "concepto": "Traslado para contestar un incidente", "plazo": "5 días" },
+                { "articulo": "", "concepto": "Notificación personal o por cédula del traslado de incidente", "plazo": "Dentro del 3º día" },
+                { "articulo": "182", "concepto": "Audiencia para recibir prueba en un incidente", "plazo": "No puede exceder de 10 días" },
+                { "articulo": "183", "concepto": "Postergar o suspender audiencia de prueba en un incidente", "plazo": "Una sola vez por plazo no mayor de 10 días" },
+                { "articulo": "188", "concepto": "Plazos en proceso sumarísimo", "plazo": "Los que fije el Juez" },
+                { "articulo": "201", "concepto": "Notificación personal o por cédula de medidas precautorias al afectado", "plazo": "3 días" },
+                { "articulo": "206", "concepto": "Resolución sobre modificación de medidas cautelares (previo traslado)", "plazo": "5 días" },
+                { "articulo": "208", "concepto": "Ordenar venta de bienes afectados con peligro de pérdida o desvalorización (previo traslado)", "plazo": "Plazo breve" },
+                { "articulo": "210", "concepto": "Caducidad de medidas cautelares (si no se interpone demanda)", "plazo": "10 días siguientes a su traba" },
+                { "articulo": "210", "concepto": "Extinción de inhibiciones y embargos", "plazo": "5 años" },
+                { "articulo": "223", "concepto": "Embargo indebidamente trabado es levantado", "plazo": "48 horas" },
+                { "articulo": "228", "concepto": "Interventor informa al Juzgado gastos extraordinarios urgentes", "plazo": "Dentro del 3º día" },
+                { "articulo": "232", "concepto": "Extinción de anotación de litis", "plazo": "5 años de su inscripción" },
+                { "articulo": "234", "concepto": "Prohibición de contratar queda sin efecto (si quien la obtiene no deduce demanda)", "plazo": "5 días" },
+                { "articulo": "240", "concepto": "Provisión de alimentos", "plazo": "No se inicia juicio correspondiente" },
+                { "articulo": "245", "concepto": "Recurso de reposición se interpone y funda por escrito (desde notificación de la resolución)", "plazo": "3 días" },
+                { "articulo": "246", "concepto": "Traslado para contestar recurso de reposición (si se interpuso por escrito)", "plazo": "3 días" },
+                { "articulo": "248", "concepto": "Revocatoria in extremis se interpone y funda por escrito (desde notificación de la resolución)", "plazo": "5 días" },
+                { "articulo": "248", "concepto": "Traslado a la contraria en revocatoria in extremis", "plazo": "5 días" },
+                { "articulo": "251", "concepto": "Plazo para apelar", "plazo": "5 días" },
+                { "articulo": "253", "concepto": "Traslado a la otra parte en apelación en relación sin efecto diferido", "plazo": "3 días" },
+                { "articulo": "253", "concepto": "Objetar forma de concesión del recurso (desde concedido)", "plazo": "5 días" },
+                { "articulo": "254", "concepto": "Apelación en efecto diferido se funda", "plazo": "En la oportunidad del Artículo 262 (juicio ordinario); conjuntamente con la expresión de agravios (juicio sumario)" }
+            ],
+            "Código Civil y Comercial de la Nación": [
+                { "articulo": "Art. 5°", "concepto": "Vigencia de las leyes", "plazo": "Después del octavo día de su publicación oficial, o desde el día que ellas determinen." },
+                { "articulo": "Art. 40", "concepto": "Revisión de sentencia de capacidad restringida", "plazo": "No superior a tres años." },
+                { "articulo": "Art. 70", "concepto": "Publicación para cambios de prenombre o apellido", "plazo": "Una vez por mes, en el lapso de dos meses." },
+                { "articulo": "Art. 70", "concepto": "Oposición a cambios de prenombre o apellido", "plazo": "Dentro de los quince días hábiles contados desde la última publicación." },
+                { "articulo": "Art. 163, inc. g)", "concepto": "Restablecimiento de pluralidad de miembros en persona jurídica", "plazo": "Dentro de los tres meses (si la ley especial exige pluralidad)." },
+                { "articulo": "Art. 862", "concepto": "Observación de rendición de cuentas", "plazo": "Dentro del plazo convenido, o dispuesto por ley, o en su defecto, treinta días de presentadas." },
+                { "articulo": "Art. 862", "concepto": "Observación de rendición de cuentas por errores (caducidad)", "plazo": "Dentro del plazo de un año de recibida." },
+                { "articulo": "Art. 864", "concepto": "Pago de saldo de rendición de cuentas aprobada", "plazo": "En el plazo convenido o dispuesto por ley, o en su defecto, diez días." },
+                { "articulo": "Art. 328", "concepto": "Conservación de libros, registros e instrumentos respaldatorios", "plazo": "Diez años (desde el último asiento, última anotación o su fecha)." },
+                { "articulo": "Art. 414", "concepto": "Oposición de contrayentes a impedimento matrimonial", "plazo": "Dentro de los tres días siguientes a la notificación." },
+                { "articulo": "Art. 414", "concepto": "Vista al Ministerio Público en oposición matrimonial", "plazo": "Tres días." },
+                { "articulo": "Art. 462", "concepto": "Nulidad de actos sobre muebles no registrables (matrimonio)", "plazo": "Caducidad de seis meses de conocido el acto y no más allá de seis meses de la extinción del régimen matrimonial." },
+                { "articulo": "Art. 526", "concepto": "Plazo de atribución de hogar común (unión convivencial)", "plazo": "Máximo de dos años desde el cese de la convivencia." },
+                { "articulo": "Art. 548", "concepto": "Presentación de demanda de alimentos post-interpelación", "plazo": "Dentro de los seis meses de la interpelación fehaciente." },
+                { "articulo": "Art. 614", "concepto": "Plazo de guarda con fines de adopción", "plazo": "No puede exceder los seis meses." },
+                { "articulo": "Art. 642", "concepto": "Atribución de responsabilidad parental por juez (desacuerdos)", "plazo": "No puede exceder de dos años." },
+                { "articulo": "Art. 643", "concepto": "Delegación de ejercicio de responsabilidad parental", "plazo": "Máximo de un año, renovable por un período más." },
+                { "articulo": "Art. 693", "concepto": "Inventario judicial por progenitor sobreviviente", "plazo": "En los tres meses subsiguientes al fallecimiento de uno de los progenitores." },
+                { "articulo": "Art. 770, inc. a)", "concepto": "Acumulación de intereses al capital (anatocismo)", "plazo": "Periodicidad no inferior a seis meses (cláusula expresa)." },
+                { "articulo": "Art. 910, inc. a)", "concepto": "Notificación depósito extrajudicial (previa)", "plazo": "Previamente (del día, hora y lugar del depósito)." },
+                { "articulo": "Art. 910, inc. b)", "concepto": "Notificación depósito extrajudicial (posterior)", "plazo": "Dentro de las cuarenta y ocho horas hábiles de realizado." },
+                { "articulo": "Art. 912", "concepto": "Derecho del acreedor que retira depósito extrajudicial (caducidad)", "plazo": "Treinta días computados a partir del recibo con reserva." },
+                { "articulo": "Art. 994", "concepto": "Vigencia de contratos preliminares (promesas)", "plazo": "Un año, o el menor convenido (renovable)." },
+                { "articulo": "Art. 1055, inc. a)", "concepto": "Caducidad de garantía por defectos ocultos (inmuebles)", "plazo": "Tres años desde que la cosa fue recibida." },
+                { "articulo": "Art. 1055, inc. b)", "concepto": "Caducidad de garantía por defectos ocultos (muebles)", "plazo": "Seis meses desde que la cosa fue recibida o puesta en funcionamiento." },
+                { "articulo": "Art. 1088, inc. c)", "concepto": "Plazo para el cumplimiento (cláusula resolutoria implícita)", "plazo": "No menor de quince días (excepto usos o índole de la prestación)." },
+                { "articulo": "Art. 1108", "concepto": "Vigencia de ofertas por medios electrónicos", "plazo": "Período fijado por oferente o, en su defecto, todo el tiempo que permanezcan accesibles." },
+                { "articulo": "Art. 1110", "concepto": "Revocación de aceptación (contratos fuera de establecimiento/a distancia)", "plazo": "Diez días desde la celebración del contrato (o desde la entrega del bien, si es posterior)." },
+                { "articulo": "Art. 1112", "concepto": "Notificación de revocación de aceptación", "plazo": "Dentro del plazo de diez días (computados según Art. 1110)." },
+                { "articulo": "Art. 1145", "concepto": "Observación de factura (compraventa de cosas muebles)", "plazo": "Dentro de los diez días de recibida (se presume aceptada en su contenido)." },
+                { "articulo": "Art. 1149", "concepto": "Entrega de la cosa (compraventa de cosas muebles)", "plazo": "Dentro de las veinticuatro horas de celebrado el contrato (excepto convención o usos)." },
+                { "articulo": "Art. 1243", "concepto": "Plazo del comodato", "plazo": "El convenido, o hasta que se satisfaga el uso para el cual fue prestado." },
+                { "articulo": "Art. 1321", "concepto": "Mandato tácito", "plazo": "No está expresamente previsto, depende de la conducta de las partes." },
+                { "articulo": "Art. 1546", "concepto": "Donación con cargo", "plazo": "No está expresamente previsto, depende de la naturaleza del cargo." },
+                { "articulo": "Art. 1740", "concepto": "Plazo para el resarcimiento de daños", "plazo": "Sin dilación injustificada." },
+                { "articulo": "Art. 1827", "concepto": "Plazo para la prescripción de la acción de nulidad de asamblea", "plazo": "Tres meses." },
+                { "articulo": "Art. 1845", "concepto": "Plazo para la prescripción de la acción de remoción de los administradores", "plazo": "Un año." },
+                { "articulo": "Art. 1957", "concepto": "Extinción del usufructo por no uso", "plazo": "Diez años." },
+                { "articulo": "Art. 1988", "concepto": "Pared privativa contigua", "plazo": "Adquisición por prescripción de veinte años." },
+                { "articulo": "Art. 2028", "concepto": "Inmisión de ruidos", "plazo": "El juez debe considerar el uso local, la relación con las necesidades de la producción y la razonabilidad del resarcimiento de daños." },
+                { "articulo": "Art. 2038", "concepto": "Servidumbre por prescripción", "plazo": "Veinte años." },
+                { "articulo": "Art. 2095", "concepto": "Caducidad del derecho de superficie", "plazo": "Cincuenta años para construcción y setenta años para forestación." },
+                { "articulo": "Art. 2110", "concepto": "Hipoteca constituida por tercero no deudor", "plazo": "No se aplica el plazo de prescripción a la acción real." },
+                { "articulo": "Art. 2188", "concepto": "Plazo del contrato de leasing", "plazo": "No hay plazo mínimo, pero el precio del ejercicio de la opción de compra debe ser inferior al valor del bien." },
+                { "articulo": "Art. 2223", "concepto": "Plazo de locación", "plazo": "Máximo de veinte años para destino habitacional y cincuenta para otros destinos." },
+                { "articulo": "Art. 2224", "concepto": "Plazo mínimo de locación de inmueble", "plazo": "Tres años." },
+                { "articulo": "Art. 2225", "concepto": "Excepciones al plazo mínimo legal de locación", "plazo": "No aplica a inmuebles para sede de embajada, consulado u organismo internacional, turismo, guarda de cosas, exposiciones, ferias, o un destino determinado." },
+                { "articulo": "Art. 2226", "concepto": "Continuación de la locación concluida", "plazo": "No hay plazo expreso, la continuación de la locación concluida es tácita." },
+                { "articulo": "Art. 2356", "concepto": "Prescripción de la acción para reclamar la partición de la herencia", "plazo": "Diez años." },
+                { "articulo": "Art. 2382", "concepto": "Plazo para la denuncia de la existencia de herederos", "plazo": "No hay plazo expreso, la denuncia es facultativa." },
+                { "articulo": "Art. 2420", "concepto": "Legado de cosa cierta", "plazo": "No está sujeto a plazo, el legatario la adquiere desde la muerte del causante." },
+                { "articulo": "Art. 2428", "concepto": "Prescripción de la acción de petición de herencia", "plazo": "Diez años desde el momento del fallecimiento del causante." },
+                { "articulo": "Art. 2560", "concepto": "Plazo de prescripción genérico", "plazo": "Cinco años." },
+                { "articulo": "Art. 2561", "concepto": "Plazo de prescripción de daños derivados de la responsabilidad civil", "plazo": "Tres años." },
+                { "articulo": "Art. 2562", "concepto": "Prescripción de cobro de honorarios profesionales, alquileres, etc.", "plazo": "Dos años." },
+                { "articulo": "Art. 2564, inc. a)", "concepto": "Prescripción de la acción de nulidad relativa de un acto jurídico", "plazo": "Dos años." },
+                { "articulo": "Art. 2564, inc. b)", "concepto": "Prescripción de la acción de revocación de donación", "plazo": "Dos años." },
+                { "articulo": "Art. 2564, inc. c)", "concepto": "Prescripción de la acción de responsabilidad del constructor por ruina", "plazo": "Un año (desde que se produjo la ruina)." },
+                { "articulo": "Art. 2564, inc. d)", "concepto": "Prescripción de reclamos de documentos endosables/al portador", "plazo": "Un año (desde el vencimiento de la obligación)." },
+                { "articulo": "Art. 50 (Ley 24.240)", "concepto": "Prescripción de sanciones (Ley 24.240)", "plazo": "Tres años." },
+                { "articulo": "Art. 6° (Ley 19.550)", "concepto": "Presentación al Registro Público (acto constitutivo de sociedad)", "plazo": "Dentro de los VEINTE (20) días del acto constitutivo." },
+                { "articulo": "Art. 6° (Ley 19.550)", "concepto": "Plazo para completar trámite de inscripción de sociedad", "plazo": "TREINTA (30) días adicionales." },
+                { "articulo": "Art. 25 (Ley 19.550)", "concepto": "Derecho de receso (subsanación en sociedades)", "plazo": "Dentro de los diez (10) días de quedar firme la decisión judicial." }
+            ],
+            "Código Procesal Civil y Comercial de la Nación": [
+                { "articulo": "Art. 11", "concepto": "Para que el tribunal superior resuelva la contienda de competencia tras recibir actuaciones de ambos jueces.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 11", "concepto": "Plazo para intimar la remisión de actuaciones en contienda de competencia, según la distancia.", "plazo": "DIEZ (10) a QUINCE (15) días" },
+                { "articulo": "Art. 18", "concepto": "Para deducir recusación por causal sobreviniente, desde su conocimiento y antes de estado de sentencia.", "plazo": "QUINTO (5) día" },
+                { "articulo": "Art. 24", "concepto": "Plazo de prueba para el incidente de recusación, si se produce en la ciudad del tribunal.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 25", "concepto": "Para resolver el incidente de recusación, desde la contestación del traslado o vencimiento del plazo.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 26", "concepto": "Para que el juez de primera instancia remita el escrito de recusación a la cámara de apelaciones.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 34 inc. 1", "concepto": "Suspensión de los términos del expediente judicial por derivación a mediación, contados desde la notificación del mediador.", "plazo": "TREINTA (30) días" },
+                { "articulo": "Art. 34 inc. 3 a)", "concepto": "Para que los jueces dicten providencias simples desde la presentación de peticiones o vencimiento de plazo.", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 34 inc. 3 b)", "concepto": "Para que los jueces dicten sentencias interlocutorias y homologatorias.", "plazo": "DIEZ (10) o QUINCE (15) días" },
+                { "articulo": "Art. 34 inc. 3 c)", "concepto": "Para que los jueces dicten sentencias definitivas en juicio ordinario, según sea juez unipersonal o tribunal colegiado.", "plazo": "CUARENTA (40) ο SESENTA (60) días" },
+                { "articulo": "Art. 34 inc. 3 c)", "concepto": "Para realizar el sorteo del expediente en juicio ordinario, desde que queda en estado de sentencia.", "plazo": "QUINCE (15) días" },
+                { "articulo": "Art. 34 inc. 3 d)", "concepto": "Para que los jueces dicten sentencias definitivas en juicio sumarísimo, según sea juez unipersonal o tribunal colegiado.", "plazo": "VEINTE (20) ο TREINTA (30) días" },
+                { "articulo": "Art. 34 inc. 3 d)", "concepto": "Para que los jueces dicten sentencias definitivas en procesos de amparo, según sea juez unipersonal o tribunal colegiado.", "plazo": "DIEZ (10) o QUINCE (15) días" },
+                { "articulo": "Art. 35 inc. 3", "concepto": "Para la ejecución de multas disciplinarias, desde que la resolución que las impuso queda firme.", "plazo": "TREINTA (30) días" },
+                { "articulo": "Art. 38 TER", "concepto": "Plazo para que las partes soliciten al juez que deje sin efecto lo dispuesto por el secretario, prosecretario o jefe de despacho.", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 46", "concepto": "Plazo para acompañar el documento que justifique la representación invocada.", "plazo": "Hasta VEINTE (20) días" },
+                { "articulo": "Art. 48", "concepto": "Para que el gestor acompañe los instrumentos de personalidad o la parte ratifique la gestión, desde la primera presentación.", "plazo": "CUARENTA (40) días hábiles" },
+                { "articulo": "Art. 53 inc. 2", "concepto": "Plazo para que el poderdante reemplace al apoderado o comparezca.", "plazo": "(Fija el juez)" },
+                { "articulo": "Art. 53 inc. 5", "concepto": "Plazo para que los herederos o representante legal comparezcan a estar a derecho en caso de muerte o incapacidad del poderdante.", "plazo": "(Fija el juez)" },
+                { "articulo": "Art. 53 inc. 5", "concepto": "Duración de la publicación de edictos para citar a herederos o representantes legales con domicilio desconocido.", "plazo": "DOS (2) días" },
+                { "articulo": "Art. 53 inc. 5", "concepto": "Para que el mandatario informe al juez sobre el deceso o incapacidad del poderdante.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 53 inc. 6", "concepto": "Plazo para que el mandante comparezca por sí o por nuevo apoderado en caso de muerte o inhabilidad del apoderado.", "plazo": "(Fija el juez)" },
+                { "articulo": "Art. 54", "concepto": "Plazo para fijar audiencia para unificar la representación de litigantes con interés común.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 59", "concepto": "Para notificar la declaración de rebeldía por edictos.", "plazo": "DOS (2) días" },
+                { "articulo": "Art. 70 inc. 2", "concepto": "Plazo para allanarse al tener conocimiento de títulos e instrumentos tardíamente presentados, para eximirse de costas.", "plazo": "QUINTO (5) día" },
+                { "articulo": "Art. 81", "concepto": "Traslado al peticionario, otra parte y organismo recaudador tras la producción de prueba en beneficio de litigar sin gastos.", "plazo": "CINCO (5) días comunes" },
+                { "articulo": "Art. 92", "concepto": "Para dictar resolución sobre el pedido de intervención de terceros.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 97", "concepto": "Si la demanda de tercería se deduce después de este plazo desde el conocimiento del embargo, se abonan costas extemporáneas.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 110", "concepto": "Para que el citado en evicción, a su vez, cite a su causante.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 112", "concepto": "Para citar al deudor en una acción subrogatoria.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 120", "concepto": "Para subsanar la omisión de copias de escritos o documentos, desde la notificación por ministerio de la ley.", "plazo": "DOS (2) días" },
+                { "articulo": "Art. 124", "concepto": "Horario límite en el día hábil inmediato para entregar un escrito no presentado en horario judicial del día de vencimiento.", "plazo": "DOS (2) primeras horas" },
+                { "articulo": "Art. 125 inc. 2", "concepto": "Anticipación con la que deben ser señaladas las audiencias, salvo razones especiales.", "plazo": "No menor de TRES (3) días" },
+                { "articulo": "Art. 125 inc. 4", "concepto": "Plazo máximo de espera para los citados a una audiencia.", "plazo": "TREINTA (30) minutos" },
+                { "articulo": "Art. 129 inc. 2", "concepto": "Para que el actor presente copias de escritos, documentos y diligencias para la reconstrucción de un expediente.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 135", "concepto": "Plazo para que los funcionarios judiciales devuelvan el expediente a despacho.", "plazo": "TERCER (3) día" },
+                { "articulo": "Art. 138", "concepto": "Para enviar las cédulas a la oficina de notificaciones.", "plazo": "VEINTICUATRO (24) horas" },
+                { "articulo": "Art. 150", "concepto": "Plazo general para contestar vistas y traslados, salvo disposición legal en contrario.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 157", "concepto": "Suspensión de plazos acordada por apoderados sin conformidad de sus mandantes.", "plazo": "No mayor de VEINTE (20) días" },
+                { "articulo": "Art. 166 inc. 2)", "concepto": "Para que la parte solicite corrección de error material, aclaración de concepto oscuro o suplir omisión en sentencia, desde la notificación.", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 167 inc. 2)", "concepto": "Anticipación para que el juez informe a la cámara sobre la imposibilidad de dictar sentencia en plazo (juicio ordinario).", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 167 inc. 2)", "concepto": "Anticipación para que el juez informe a la cámara sobre la imposibilidad de dictar sentencia en plazo (demás casos).", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 170", "concepto": "Plazo para promover incidente de nulidad, a partir del conocimiento del acto, para evitar el consentimiento tácito.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 180", "concepto": "Para dar traslado de un incidente a la otra parte.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 180", "concepto": "Para notificar personalmente o por cédula el traslado de un incidente.", "plazo": "TERCER (3) día" },
+                { "articulo": "Art. 181", "concepto": "Plazo para señalar audiencia de prueba en incidentes, desde la contestación del traslado o vencimiento del plazo.", "plazo": "No exceder de DIEZ (10) días" },
+                { "articulo": "Art. 182", "concepto": "Plazo máximo para postergar o suspender una audiencia de prueba en un incidente.", "plazo": "No mayor de DIEZ (10) días" },
+                { "articulo": "Art. 198", "concepto": "Para notificar personalmente o por cédula las medidas precautorias al afectado, si no tomó conocimiento en la ejecución.", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 203", "concepto": "Plazo para dar traslado a la otra parte para ampliación, mejora o sustitución de medida cautelar.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 207", "concepto": "Plazo de caducidad de medidas cautelares previas al proceso si no se interpone demanda o inicia mediación.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 207", "concepto": "Plazo para reiniciar la demanda después de la mediación si no hay acuerdo, desde la fecha del acta del mediador.", "plazo": "VEINTE (20) días" },
+                { "articulo": "Art. 207", "concepto": "Plazo para la extinción de inhibiciones y embargos desde su anotación, salvo reinscripción.", "plazo": "CINCO (5) años" },
+                { "articulo": "Art. 231", "concepto": "Plazo para que la prohibición de contratar quede sin efecto si quien la obtuvo no deduce la demanda.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 237", "concepto": "Plazo para que la provisión de alimentos en medidas complementarias quede sin efecto si no se inicia el juicio correspondiente.", "plazo": "TREINTA (30) días" },
+                { "articulo": "Art. 239", "concepto": "Plazo para interponer y fundar por escrito el recurso de reposición.", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 240", "concepto": "Plazo para dar traslado del recurso de reposición.", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 240", "concepto": "Plazo para que el juez resuelva el recurso de reposición con informe", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 241", "concepto": "Plazo para dictar providencia que concede o deniega recurso de reposición", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 245", "concepto": "Plazo para interponer apelación", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 250", "concepto": "Plazo para remitir expediente al superior para resolver apelación", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 254", "concepto": "Plazo para presentar memoria en recurso de apelación", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 255", "concepto": "Plazo para remitir expediente a la mesa de entradas del tribunal de apelación", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 259", "concepto": "Plazo para expresar agravios en juicio ordinario", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 260", "concepto": "Plazo para presentar contestación a la expresión de agravios", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 262", "concepto": "Plazo para dar vista al Ministerio Público o defensores de menores o incapaces", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 263", "concepto": "Plazo para dictar sentencia por tribunal de apelación", "plazo": "60 días" },
+                { "articulo": "Art. 265", "concepto": "Plazo para interponer recurso extraordinario", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 272", "concepto": "Plazo para que el tribunal superior decida sobre el recurso extraordinario", "plazo": "30 días" },
+                { "articulo": "Art. 280", "concepto": "Plazo para interponer recurso de queja", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 282", "concepto": "Plazo para resolver la queja", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 283", "concepto": "Plazo para dictar sentencia en juicio de amparo", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 287", "concepto": "Plazo para pedir nulidad de actos procesales", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 296", "concepto": "Plazo para resolver sobre la recusación de un juez", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 306", "concepto": "Plazo para el demandado para oponer excepciones", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 312", "concepto": "Plazo para dictar resolución sobre las excepciones", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 320", "concepto": "Plazo para contestar demanda", "plazo": "15 días" },
+                { "articulo": "Art. 329", "concepto": "Plazo para reconvenir", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 343", "concepto": "Plazo para que el juez dicte providencias sobre la demanda y su contestación", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 360", "concepto": "Plazo para realizar la audiencia preliminar", "plazo": "Dentro de 15 días" },
+                { "articulo": "Art. 362", "concepto": "Plazo para que el juez resuelva sobre la producción de la prueba", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 370", "concepto": "Plazo para producir la prueba en el juicio ordinario", "plazo": "40 días" },
+                { "articulo": "Art. 385", "concepto": "Plazo para que el perito presente el informe", "plazo": "15 días" },
+                { "articulo": "Art. 396", "concepto": "Plazo para la audiencia para recibir la prueba testimonial", "plazo": "15 días" },
+                { "articulo": "Art. 415", "concepto": "Plazo para que el juez dicte providencia sobre la prueba testimonial", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 429", "concepto": "Plazo para que el juez resuelva sobre la prueba documental", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 438", "concepto": "Plazo para el alegato", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 439", "concepto": "Plazo para que el juez llame autos para sentencia", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 444", "concepto": "Plazo para que el juez dicte sentencia en el juicio ordinario", "plazo": "40 o 60 días" },
+                { "articulo": "Art. 450", "concepto": "Plazo para que las partes pidan aclaración de la sentencia", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 452", "concepto": "Plazo para que el juez aclare la sentencia", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 453", "concepto": "Plazo para que las partes pidan nulidad de la sentencia", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 454", "concepto": "Plazo para que el juez resuelva sobre la nulidad de la sentencia", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 456", "concepto": "Plazo para interponer recurso de apelación contra la sentencia definitiva", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 466", "concepto": "Plazo para interponer recurso de nulidad", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 473", "concepto": "Plazo para interponer recurso de casación", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 488", "concepto": "Plazo para dictar sentencia en juicio de amparo", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 496", "concepto": "Plazo para resolver sobre la recusación", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 510", "concepto": "Plazo para la mediación prejudicial obligatoria", "plazo": "45 días" },
+                { "articulo": "Art. 524", "concepto": "Plazo para interponer acción de desalojo por falta de pago", "plazo": "5 días" },
+                { "articulo": "Art. 531", "concepto": "Plazo para contestar demanda de desalojo", "plazo": "10 días" },
+                { "articulo": "Art. 544", "concepto": "Plazo para el demandado para oponer excepciones", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 548", "concepto": "Plazo para dictar sentencia en juicio sumario", "plazo": "15 días" },
+                { "articulo": "Art. 556", "concepto": "Plazo para interponer recurso de apelación contra la sentencia del juicio sumario", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 560", "concepto": "Plazo para interponer recurso de reposición en juicio sumario", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 561", "concepto": "Plazo para interponer recurso de nulidad en juicio sumario", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 565", "concepto": "Plazo para la audiencia para recibir la prueba en juicio sumario", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 574", "concepto": "Plazo para alegar en juicio sumario", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 575", "concepto": "Plazo para que el juez llame autos para sentencia en juicio sumario", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 581", "concepto": "Plazo para que el juez dicte sentencia en el juicio sumario", "plazo": "15 días" },
+                { "articulo": "Art. 582", "concepto": "Plazo para que las partes pidan aclaración de la sentencia en juicio sumario", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 583", "concepto": "Plazo para que el juez aclare la sentencia en juicio sumario", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 584", "concepto": "Plazo para que las partes pidan nulidad de la sentencia en juicio sumario", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 585", "concepto": "Plazo para que el juez resuelva sobre la nulidad de la sentencia en juicio sumario", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 586", "concepto": "Plazo para interponer recurso de apelación contra la sentencia definitiva del juicio sumario", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 592", "concepto": "Plazo para interponer recurso de nulidad en juicio sumario", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 602", "concepto": "Plazo para interponer recurso de apelación contra la sentencia de juicio de desalojo", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 614", "concepto": "Plazo para la mediación en juicio ejecutivo", "plazo": "15 días" },
+                { "articulo": "Art. 620", "concepto": "Plazo para interponer excepciones en juicio ejecutivo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 624", "concepto": "Plazo para dictar sentencia en juicio ejecutivo", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 631", "concepto": "Plazo para interponer recurso de apelación en juicio ejecutivo", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 637", "concepto": "Plazo para interponer recurso de nulidad en juicio ejecutivo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 642", "concepto": "Plazo para interponer recurso de casación en juicio ejecutivo", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 644", "concepto": "Plazo para interponer recurso de queja en juicio ejecutivo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 648", "concepto": "Plazo para la audiencia en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 650", "concepto": "Plazo para la audiencia para recibir la prueba en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 651", "concepto": "Plazo para alegar en juicio de amparo", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 652", "concepto": "Plazo para que el juez dicte sentencia en juicio de amparo", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 656", "concepto": "Plazo para interponer recurso de apelación en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 660", "concepto": "Plazo para la audiencia para recibir la prueba en juicio de amparo", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 661", "concepto": "Plazo para que el juez dicte sentencia en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 665", "concepto": "Plazo para interponer recurso de apelación en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 669", "concepto": "Plazo para la audiencia para recibir la prueba en juicio de amparo", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 670", "concepto": "Plazo para que el juez dicte sentencia en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 674", "concepto": "Plazo para interponer recurso de apelación en juicio de amparo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 770", "concepto": "Plazo para que el perito presente el informe pericial en arbitraje", "plazo": "1 mes" },
+                { "articulo": "Art. 773", "concepto": "Plazo para que las partes pidan aclaración del laudo", "plazo": "TRES (3) días" },
+                { "articulo": "Art. 775", "concepto": "Plazo para interponer recurso de nulidad contra el laudo", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 775", "concepto": "Plazo para dar traslado de la demanda de nulidad de laudo de amigables componedores.", "plazo": "CINCO (5) días" },
+                { "articulo": "Art. 773", "concepto": "Plazo para pronunciar la pericia arbitral si no se fijó uno.", "plazo": "UN (1) mes" },
+                { "articulo": "Art. 775", "concepto": "Plazo para apelar la resolución de autorización para contraer matrimonio.", "plazo": "QUINTO (5) día" },
+                { "articulo": "Art. 775", "concepto": "Plazo para que el tribunal de alzada se pronuncie sobre la apelación de autorización de matrimonio.", "plazo": "DIEZ (10) días" },
+                { "articulo": "Art. 780", "concepto": "Plazo para la audiencia en solicitud de autorización para comparecer en juicio y ejercer actos jurídicos.", "plazo": "TERCER (3) día" },
+                { "articulo": "Art. 783", "concepto": "Plazo para que el vendedor alegue sus defensas en la adquisición de mercaderías por cuenta del vendedor.", "plazo": "TRES (3) días" }
+            ]
+        };
+
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const printButton = document.getElementById('printButton');
+        const resultsContainer = document.getElementById('results');
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close');
+        const modules = document.querySelectorAll('.module');
+
+        function performSearch() {
+            const query = searchInput.value.toLowerCase();
+            const filteredData = {};
+            if (query.length > 0) {
+                for (const source in data) {
+                    filteredData[source] = data[source].filter(item => {
+                        return (item.concepto.toLowerCase().includes(query) || item.plazo.toLowerCase().includes(query) || item.articulo.toLowerCase().includes(query));
+                    });
+                }
+            }
+            displayResults(filteredData);
+        }
+
+        function displayResults(filteredData) {
+            resultsContainer.innerHTML = '';
+            let hasContent = false;
+
+            for (const source in filteredData) {
+                if (filteredData[source].length > 0) {
+                    hasContent = true;
+                    const groupTitle = document.createElement('h2');
+                    groupTitle.textContent = source;
+                    resultsContainer.appendChild(groupTitle);
+
+                    const groupContainer = document.createElement('div');
+                    groupContainer.classList.add('result-group');
+                    
+                    filteredData[source].forEach(item => {
+                        const resultItem = document.createElement('div');
+                        resultItem.classList.add('result-item');
+                        
+                        const articulo = document.createElement('p');
+                        articulo.innerHTML = `<strong>Artículo:</strong> ${item.articulo}`;
+                        resultItem.appendChild(articulo);
+                        
+                        const concepto = document.createElement('p');
+                        concepto.innerHTML = `<strong>Concepto:</strong> ${item.concepto}`;
+                        resultItem.appendChild(concepto);
+                        
+                        const plazo = document.createElement('p');
+                        plazo.innerHTML = `<strong>Plazo:</strong> ${item.plazo}`;
+                        resultItem.appendChild(plazo);
+
+                        groupContainer.appendChild(resultItem);
+                    });
+                    resultsContainer.appendChild(groupContainer);
+                }
+            }
+
+            if (!hasContent) {
+                resultsContainer.innerHTML = '<p style="text-align: center; color: #777;">No se encontraron resultados para la búsqueda.</p>';
+            }
+        }
+
+        function populateModal(sourceId, tableBodyId) {
+            const tableBody = document.getElementById(tableBodyId);
+            tableBody.innerHTML = ''; // Clear previous content
+
+            const sourceData = data[sourceId];
+            if (sourceData) {
+                sourceData.forEach(item => {
+                    const row = document.createElement('tr');
+                    let cells = '';
+                    if (sourceId === "Código Civil y Comercial de la Nación") {
+                        cells = `<td>${item.concepto}</td><td>${item.plazo}</td><td>${item.articulo}</td>`;
+                    } else {
+                        cells = `<td>${item.articulo}</td><td>${item.concepto}</td><td>${item.plazo}</td>`;
+                    }
+                    row.innerHTML = cells;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        printButton.addEventListener('click', function() {
+            const printContent = document.getElementById('results').innerHTML;
+            const originalContent = document.body.innerHTML;
+
+            document.body.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                    <h1 style="text-align: center;">Resultados de Búsqueda de Plazos Legales</h1>
+                    ${printContent}
+                </div>
+            `;
+            window.print();
+            document.body.innerHTML = originalContent;
+            // Reload the original state by adding the script and event listeners back
+            location.reload();
+        });
+
+        // Modal functionality
+        modules.forEach(module => {
+            module.addEventListener('click', function() {
+                const modalId = this.dataset.modal;
+                const modal = document.getElementById(modalId);
+                if (modalId === "ley-xii-modal") {
+                    populateModal("Ley XII - N.º 27 (Misiones)", "ley-xii-body");
+                } else if (modalId === "ccyc-modal") {
+                    populateModal("Código Civil y Comercial de la Nación", "ccyc-body");
+                } else if (modalId === "cpccn-modal") {
+                    populateModal("Código Procesal Civil y Comercial de la Nación", "cpccn-body");
+                }
+                modal.style.display = "flex";
+            });
+        });
+
+        closeButtons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const modal = this.closest('.modal');
+                modal.style.display = "none";
+            });
+        });
+
+        window.addEventListener('click', function(event) {
+            modals.forEach(modal => {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            });
+        });
+    </script>
+</body>
+</html>
