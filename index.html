@@ -1,1 +1,259 @@
-ACTUALIZANDO...DISCULPE LA MOLESTIA
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora plazos procesales</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .main-container {
+            display: flex;
+            gap: 40px;
+            width: 90%;
+            max-width: 1200px;
+        }
+        .calc-container {
+            flex: 1;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+            max-width: 550px;
+        }
+        .modules-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+        }
+        h1 {
+            color: #1e3a5f;
+            margin-bottom: 25px;
+            font-size: 26px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 25px;
+            text-align: left;
+        }
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #4b6584;
+            font-weight: 600;
+        }
+        input[type="date"], input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #c9d2da;
+            border-radius: 10px;
+            box-sizing: border-box;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            border-color: #5a7d9a;
+            outline: none;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        .btn {
+            color: white;
+            padding: 16px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 17px;
+            font-weight: bold;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn-calculate {
+            background-image: linear-gradient(135deg, #3498db, #2980b9);
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
+        }
+        .btn-print {
+            background-image: linear-gradient(135deg, #2ecc71, #27ae60);
+            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+        }
+        .btn-print:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+        }
+        #resultado {
+            margin-top: 35px;
+            padding: 25px;
+            border-radius: 12px;
+            background-color: #ecf0f1;
+            font-size: 18px;
+            color: #2c3e50;
+            text-align: center;
+            line-height: 1.6;
+            border: 1px dashed #bdc3c7;
+        }
+        #resultado p {
+            margin: 0;
+        }
+        .color-blue {
+            color: #3498db;
+        }
+        .color-red {
+            color: #e74c3c;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+        .module {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            border-radius: 16px;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+            text-decoration: none;
+        }
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        /* Color azul para todos los módulos */
+        .module-1, .module-2, .module-3 {
+            background-image: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+            color: #2c3e50;
+        }
+        /* Estilos para impresión */
+        @media print {
+            body { background-color: #fff; }
+            .main-container { display: block; }
+            .calc-container { box-shadow: none; padding: 0; }
+            .modules-container { display: none; }
+            .form-group, .btn-group { display: none; }
+            h1 { color: #000; }
+            #resultado { border: none; background-color: transparent; padding: 0; font-size: 16px; }
+            .color-blue { color: #3498db !important; }
+            .color-red { color: #e74c3c !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <div class="calc-container">
+            <h1>Calculadora de Plazos Procesales<br>Defensoria Civil y Comercial 6</h1>
+            <div class="form-group">
+                <label for="fechaNotificacion">Fecha de Notificación:</label>
+                <input type="date" id="fechaNotificacion">
+            </div>
+            <div class="form-group">
+                <label for="plazoDias">Plazo en días hábiles:</label>
+                <input type="number" id="plazoDias" min="1" value="5">
+            </div>
+            <div class="form-group">
+                <label for="tipoEscrito">Tipo de Escrito/Resolución/Sentencia:</label>
+                <input type="text" id="tipoEscrito" placeholder="Ej: Contestación de demanda, Recurso de apelación">
+            </div>
+            <div class="form-group">
+                <label for="normativa">Normativa de referencia aplicable:</label>
+                <input type="text" id="normativa" placeholder="Ej: Art. 347 del C.P.C.C. de Misiones">
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-calculate" onclick="calcularPlazo()">Calcular Vencimiento</button>
+                <button class="btn btn-print" onclick="window.print()">Imprimir</button>
+            </div>
+            <div id="resultado">
+                <p>El resultado del cálculo aparecerá aquí.</p>
+            </div>
+        </div>
+        <div class="modules-container">
+            <a class="module module-1" href="https://admindefensoria6.github.io/CodigoCivilComercial/" target="_blank">
+                Código Civil y Comercial
+            </a>
+            <a class="module module-2" href="https://defensorialocal-seis.github.io/LEYmisiones/" target="_blank">
+                Ley XII-27 CCyCFVF Misiones
+            </a>
+            <a class="module module-3" href="https://defensorialocal-seis.github.io/CPCCN/" target="_blank">
+                C.P.C.C. de la Nación
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function calcularPlazo() {
+            const fechaInput = document.getElementById('fechaNotificacion').value;
+            const plazoDias = parseInt(document.getElementById('plazoDias').value);
+            const tipoEscrito = document.getElementById('tipoEscrito').value;
+            const normativa = document.getElementById('normativa').value;
+            const resultadoDiv = document.getElementById('resultado');
+
+            if (!fechaInput || isNaN(plazoDias) || plazoDias <= 0) {
+                resultadoDiv.innerHTML = '<p class="error">Por favor, ingrese una fecha y un plazo válido.</p>';
+                return;
+            }
+
+            let fecha = new Date(fechaInput + 'T00:00:00'); 
+            let diasContados = 0;
+            
+            fecha.setDate(fecha.getDate() + 1);
+
+            while (diasContados < plazoDias) {
+                const diaDeLaSemana = fecha.getDay();
+                if (diaDeLaSemana !== 0 && diaDeLaSemana !== 6) {
+                    diasContados++;
+                }
+                
+                if (diasContados < plazoDias) {
+                    fecha.setDate(fecha.getDate() + 1);
+                }
+            }
+
+            const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const fechaVencimiento = new Date(fecha);
+            const fechaVencimientoStr = fechaVencimiento.toLocaleDateString('es-ES', opcionesFecha);
+
+            const fechaGracia = new Date(fechaVencimiento);
+            fechaGracia.setDate(fechaGracia.getDate() + 1);
+            while (fechaGracia.getDay() === 0 || fechaGracia.getDay() === 6) {
+                fechaGracia.setDate(fechaGracia.getDate() + 1);
+            }
+            const fechaGraciaStr = fechaGracia.toLocaleDateString('es-ES', opcionesFecha);
+
+            const horaVencimiento = '12:00 hs.';
+            const horaGracia = '08:59 hs.';
+
+            resultadoDiv.innerHTML = `
+                ${tipoEscrito ? `<p><strong>Tipo:</strong> ${tipoEscrito}</p>` : ''}
+                ${normativa ? `<p><strong>Normativa:</strong> ${normativa}</p>` : ''}
+                <hr>
+                <p>El plazo de <strong>${plazoDias}</strong> días hábiles vence el:</p>
+                <p><strong><span class="color-blue">${fechaVencimientoStr}</span></strong> a las <strong><span class="color-blue">${horaVencimiento}</span></strong></p>
+                <p>Plazo de Gracia:</p>
+                <p>Vence el <strong><span class="color-red">${fechaGraciaStr}</span></strong> a las <strong><span class="color-red">${horaGracia}</span></strong></p>
+            `;
+        }
+    </script>
+</body>
+</html>
