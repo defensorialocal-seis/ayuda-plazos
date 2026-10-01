@@ -1,259 +1,280 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calculadora plazos procesales</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #f0f4f8;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .main-container {
-            display: flex;
-            gap: 40px;
-            width: 90%;
-            max-width: 1200px;
-        }
-        .calc-container {
-            flex: 1;
-            background-color: #ffffff;
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            max-width: 550px;
-        }
-        .modules-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            justify-content: center;
-        }
-        h1 {
-            color: #1e3a5f;
-            margin-bottom: 25px;
-            font-size: 26px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .form-group {
-            margin-bottom: 25px;
-            text-align: left;
-        }
-        label {
-            display: block;
-            margin-bottom: 10px;
-            color: #4b6584;
-            font-weight: 600;
-        }
-        input[type="date"], input[type="number"], input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            border: 1px solid #c9d2da;
-            border-radius: 10px;
-            box-sizing: border-box;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-        input:focus {
-            border-color: #5a7d9a;
-            outline: none;
-        }
-        .btn-group {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-        }
-        .btn {
-            color: white;
-            padding: 16px 30px;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 17px;
-            font-weight: bold;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .btn-calculate {
-            background-image: linear-gradient(135deg, #3498db, #2980b9);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
-        }
-        .btn-calculate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.5);
-        }
-        .btn-print {
-            background-image: linear-gradient(135deg, #2ecc71, #27ae60);
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
-        }
-        .btn-print:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
-        }
-        #resultado {
-            margin-top: 35px;
-            padding: 25px;
-            border-radius: 12px;
-            background-color: #ecf0f1;
-            font-size: 18px;
-            color: #2c3e50;
-            text-align: center;
-            line-height: 1.6;
-            border: 1px dashed #bdc3c7;
-        }
-        #resultado p {
-            margin: 0;
-        }
-        .color-blue {
-            color: #3498db;
-        }
-        .color-red {
-            color: #e74c3c;
-        }
-        .error {
-            color: #e74c3c;
-            font-weight: 600;
-        }
-        .module {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 150px;
-            border-radius: 16px;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
-            text-decoration: none;
-        }
-        .module:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-        /* Color azul para todos los módulos */
-        .module-1, .module-2, .module-3 {
-            background-image: linear-gradient(135deg, #a1c4fd, #c2e9fb);
-            color: #2c3e50;
-        }
-        /* Estilos para impresión */
-        @media print {
-            body { background-color: #fff; }
-            .main-container { display: block; }
-            .calc-container { box-shadow: none; padding: 0; }
-            .modules-container { display: none; }
-            .form-group, .btn-group { display: none; }
-            h1 { color: #000; }
-            #resultado { border: none; background-color: transparent; padding: 0; font-size: 16px; }
-            .color-blue { color: #3498db !important; }
-            .color-red { color: #e74c3c !important; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de plazos procesales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0b2447; --blue-900:#123a7a; --blue-600:#2563eb; --blue-500:#3b82f6;
+  --blue-100:#dbe8fe; --blue-50:#eff5ff; --ink:#0f1f3a; --muted:#5b6b86;
+  --line:#d5e0f2; --red:#d92d4b; --green:#0f9d6b; --bg:#eaf1fc; --card:#fff;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; min-height:100vh; padding:32px 20px;
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  color:var(--ink);
+  background:radial-gradient(1000px 500px at 10% -10%,#cfe0fb 0,transparent 60%),var(--bg);
+  display:flex; justify-content:center; align-items:center;
+}
+.main{display:grid; grid-template-columns:minmax(0,560px) 280px; gap:28px; width:100%; max-width:900px; align-items:start}
+.card{background:var(--card); border-radius:22px; box-shadow:0 1px 2px rgba(11,36,71,.06),0 18px 48px rgba(18,58,122,.14); overflow:hidden}
+.head{background:linear-gradient(135deg,var(--navy),var(--blue-900) 60%,var(--blue-600)); color:#fff; padding:28px 32px}
+.head h1{margin:0; font-size:22px; font-weight:800; letter-spacing:-.01em}
+.head p{margin:6px 0 0; font-size:14px; font-weight:500; color:#bcd3f7}
+.body{padding:28px 32px 32px}
+.field{margin-bottom:20px}
+label,.lbl{display:block; margin-bottom:8px; font-size:13.5px; font-weight:600; color:var(--blue-900)}
+input[type=date],input[type=number],input[type=text]{
+  width:100%; padding:13px 14px; font:inherit; font-size:15px; color:var(--ink);
+  background:var(--blue-50); border:1.5px solid var(--line); border-radius:12px;
+  transition:border-color .2s, box-shadow .2s, background .2s;
+}
+input:focus{outline:none; background:#fff; border-color:var(--blue-500); box-shadow:0 0 0 4px rgba(59,130,246,.18)}
+.row{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+.seg{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; background:var(--blue-100); border-radius:14px}
+.seg input{position:absolute; opacity:0; pointer-events:none}
+.seg label{margin:0; padding:11px 8px; text-align:center; font-size:14px; font-weight:700; color:var(--blue-900); border-radius:10px; cursor:pointer; transition:background .2s,color .2s,box-shadow .2s}
+.seg input:checked + label{background:#fff; color:var(--blue-600); box-shadow:0 2px 8px rgba(18,58,122,.18)}
+.seg input:focus-visible + label{outline:3px solid rgba(59,130,246,.45)}
+.hint{margin:8px 2px 0; font-size:12.5px; color:var(--muted); line-height:1.45}
+.btns{display:flex; gap:12px; margin-top:26px}
+.btn{
+  flex:1; padding:15px 20px; border:0; border-radius:12px; font:inherit; font-size:15px; font-weight:700;
+  cursor:pointer; transition:transform .15s, box-shadow .2s, background .2s;
+}
+.btn:focus-visible{outline:3px solid rgba(59,130,246,.5); outline-offset:2px}
+.btn-primary{flex:2; color:#fff; background:linear-gradient(135deg,var(--blue-500),var(--blue-600)); box-shadow:0 6px 18px rgba(37,99,235,.35)}
+.btn-primary:hover{transform:translateY(-2px); box-shadow:0 10px 24px rgba(37,99,235,.42)}
+.btn-ghost{color:var(--blue-900); background:#fff; border:1.5px solid var(--line)}
+.btn-ghost:hover{background:var(--blue-50); border-color:var(--blue-500); transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+#resultado{margin-top:26px; padding:22px; border-radius:16px; background:var(--blue-50); border:1.5px dashed #b5c9ec; font-size:15px; line-height:1.55; text-align:center; color:var(--muted)}
+#resultado p{margin:0 0 4px}
+#resultado .meta{color:var(--ink); font-size:14px; text-align:left}
+#resultado hr{border:0; border-top:1px solid var(--line); margin:14px 0}
+.lbl-r{margin-top:14px !important; font-size:12.5px; font-weight:700; color:var(--muted)}
+.fecha{display:block; font-size:19px; font-weight:800; letter-spacing:-.01em}
+.blue{color:var(--blue-600)} .red{color:var(--red)}
+.nota{margin-top:14px !important; font-size:12.5px; color:var(--muted)}
+.error{color:var(--red); font-weight:600}
+.modules{display:flex; flex-direction:column; gap:14px}
+.module{
+  display:flex; flex-direction:column; justify-content:center; gap:4px; min-height:110px; padding:20px 22px;
+  text-decoration:none; color:var(--navy); font-weight:800; font-size:17px; line-height:1.25;
+  background:linear-gradient(135deg,#fff,var(--blue-100)); border:1.5px solid var(--line); border-radius:18px;
+  box-shadow:0 8px 24px rgba(18,58,122,.10); transition:transform .2s, box-shadow .2s, border-color .2s;
+}
+.module small{font-size:12.5px; font-weight:500; color:var(--muted)}
+.module:hover{transform:translateY(-4px); border-color:var(--blue-500); box-shadow:0 14px 30px rgba(37,99,235,.2)}
+.module:focus-visible{outline:3px solid rgba(59,130,246,.5); outline-offset:2px}
+@media (max-width:860px){.main{grid-template-columns:1fr; max-width:560px} .modules{flex-direction:row; flex-wrap:wrap} .module{flex:1 1 160px; min-height:90px}}
+@media (max-width:480px){.row{grid-template-columns:1fr} .head,.body{padding-left:20px; padding-right:20px} .btns{flex-direction:column}}
+@media print{
+  body{background:#fff; padding:0; display:block}
+  .main{display:block} .modules,.field,.btns,.hint,.head p{display:none}
+  .card{box-shadow:none} .head{background:none; color:#000; padding:0 0 12px}
+  .body{padding:0} #resultado{border:0; background:none; padding:0}
+  .blue{color:#2563eb !important} .red{color:#d92d4b !important}
+}
+
+.visor{display:none; flex-direction:column; width:100%; max-width:1200px; height:calc(100vh - 64px); background:#fff; border-radius:22px; overflow:hidden; box-shadow:0 1px 2px rgba(11,36,71,.06),0 18px 48px rgba(18,58,122,.14)}
+body.en-visor{align-items:stretch}
+body.en-visor .main{display:none}
+body.en-visor .visor{display:flex}
+.visor-bar{display:flex; align-items:center; gap:12px; padding:12px 16px; background:linear-gradient(135deg,var(--navy),var(--blue-900) 60%,var(--blue-600)); color:#fff}
+.visor-bar h2{flex:1; margin:0; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.visor-bar .btn{flex:none; padding:10px 16px; font-size:14px; border-radius:10px}
+.visor-bar .btn-back{background:#fff; color:var(--blue-900)}
+.visor-bar .btn-back:hover{background:var(--blue-100); transform:translateY(-1px)}
+.visor-bar .btn-ext{background:rgba(255,255,255,.14); color:#fff; text-decoration:none; display:inline-flex; align-items:center}
+.visor-bar .btn-ext:hover{background:rgba(255,255,255,.26)}
+.visor iframe{flex:1; width:100%; border:0; background:#fff}
+@media (max-width:600px){.visor-bar .btn-ext{display:none} body{padding:12px} .visor{height:calc(100vh - 24px); border-radius:16px}}
+@media print{.visor{display:none !important}}
+</style>
 </head>
 <body>
-    <div class="main-container">
-        <div class="calc-container">
-            <h1>Calculadora de Plazos Procesales<br>Defensoria Civil y Comercial 6</h1>
-            <div class="form-group">
-                <label for="fechaNotificacion">Fecha de Notificación:</label>
-                <input type="date" id="fechaNotificacion">
-            </div>
-            <div class="form-group">
-                <label for="plazoDias">Plazo en días hábiles:</label>
-                <input type="number" id="plazoDias" min="1" value="5">
-            </div>
-            <div class="form-group">
-                <label for="tipoEscrito">Tipo de Escrito/Resolución/Sentencia:</label>
-                <input type="text" id="tipoEscrito" placeholder="Ej: Contestación de demanda, Recurso de apelación">
-            </div>
-            <div class="form-group">
-                <label for="normativa">Normativa de referencia aplicable:</label>
-                <input type="text" id="normativa" placeholder="Ej: Art. 347 del C.P.C.C. de Misiones">
-            </div>
-            <div class="btn-group">
-                <button class="btn btn-calculate" onclick="calcularPlazo()">Calcular Vencimiento</button>
-                <button class="btn btn-print" onclick="window.print()">Imprimir</button>
-            </div>
-            <div id="resultado">
-                <p>El resultado del cálculo aparecerá aquí.</p>
-            </div>
-        </div>
-        <div class="modules-container">
-            <a class="module module-1" href="https://admindefensoria6.github.io/CodigoCivilComercial/" target="_blank">
-                Código Civil y Comercial
-            </a>
-            <a class="module module-2" href="https://defensorialocal-seis.github.io/LEYmisiones/" target="_blank">
-                Ley XII-27 CCyCFVF Misiones
-            </a>
-            <a class="module module-3" href="https://defensorialocal-seis.github.io/CPCCN/" target="_blank">
-                C.P.C.C. de la Nación
-            </a>
-        </div>
+<div class="main">
+  <div class="card">
+    <div class="head">
+      <h1>Calculadora de plazos procesales</h1>
+      <p>Defensoría Civil y Comercial 6</p>
     </div>
+    <div class="body">
+      <div class="field">
+        <span class="lbl">Cómputo del plazo</span>
+        <div class="seg" role="radiogroup" aria-label="Tipo de cómputo">
+          <input type="radio" name="computo" id="c-habiles" value="habiles" checked>
+          <label for="c-habiles">Días hábiles judiciales</label>
+          <input type="radio" name="computo" id="c-corridos" value="corridos">
+          <label for="c-corridos">Días corridos</label>
+        </div>
+        <p class="hint" id="hint"></p>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="fechaNotificacion">Fecha de notificación</label>
+          <input type="date" id="fechaNotificacion">
+        </div>
+        <div class="field">
+          <label for="plazoDias">Plazo en días</label>
+          <input type="number" id="plazoDias" min="1" value="5">
+        </div>
+      </div>
+      <div class="field">
+        <label for="tipoEscrito">Tipo de escrito / resolución / sentencia</label>
+        <input type="text" id="tipoEscrito" placeholder="Ej: Contestación de demanda, Recurso de apelación">
+      </div>
+      <div class="field">
+        <label for="normativa">Normativa de referencia aplicable</label>
+        <input type="text" id="normativa" placeholder="Ej: Art. 347 del C.P.C.C. de Misiones">
+      </div>
+      <div class="btns">
+        <button class="btn btn-primary" onclick="calcularPlazo()">Calcular vencimiento</button>
+        <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
+      </div>
+      <div id="resultado" aria-live="polite"><p>El resultado del cálculo aparecerá aquí.</p></div>
+    </div>
+  </div>
 
-    <script>
-        function calcularPlazo() {
-            const fechaInput = document.getElementById('fechaNotificacion').value;
-            const plazoDias = parseInt(document.getElementById('plazoDias').value);
-            const tipoEscrito = document.getElementById('tipoEscrito').value;
-            const normativa = document.getElementById('normativa').value;
-            const resultadoDiv = document.getElementById('resultado');
+  <nav class="modules" aria-label="Normativa">
+    <a class="module" href="https://admindefensoria6.github.io/CodigoCivilComercial/" target="_blank" rel="noopener" data-visor="Código Civil y Comercial">Código Civil y Comercial<small>Consultar texto</small></a>
+    <a class="module" href="https://defensorialocal-seis.github.io/LEYmisiones/" target="_blank" rel="noopener" data-visor="Ley XII-27 CCyCFVF Misiones">Ley XII-27 CCyCFVF Misiones<small>Consultar texto</small></a>
+    <a class="module" href="https://defensorialocal-seis.github.io/CPCCN/" target="_blank" rel="noopener" data-visor="C.P.C.C. de la Nación">C.P.C.C. de la Nación<small>Consultar texto</small></a>
+  </nav>
+</div>
 
-            if (!fechaInput || isNaN(plazoDias) || plazoDias <= 0) {
-                resultadoDiv.innerHTML = '<p class="error">Por favor, ingrese una fecha y un plazo válido.</p>';
-                return;
-            }
+<section class="visor" id="visor" aria-label="Visor de normativa">
+  <div class="visor-bar">
+    <button class="btn btn-back" type="button" onclick="cerrarVisor()">← Volver a la calculadora</button>
+    <h2 id="visorTitulo"></h2>
+    <a class="btn btn-ext" id="visorExt" href="#" target="_blank" rel="noopener">Abrir en pestaña nueva</a>
+  </div>
+  <iframe id="visorFrame" title="Contenido" loading="lazy"></iframe>
+</section>
 
-            let fecha = new Date(fechaInput + 'T00:00:00'); 
-            let diasContados = 0;
-            
-            fecha.setDate(fecha.getDate() + 1);
+<script>
+/* ============ FERIADOS Y DÍAS INHÁBILES (formato AAAA-MM-DD) ============
+   Editar aquí para agregar o quitar fechas. Verificar contra el calendario oficial. */
+const FERIADOS = {
+  // 2026 - nacionales y puentes
+  '2026-01-01':'Año Nuevo',
+  '2026-02-16':'Carnaval','2026-02-17':'Carnaval',
+  '2026-03-23':'Feriado puente','2026-03-24':'Día de la Memoria',
+  '2026-04-02':'Día del Veterano de Malvinas','2026-04-03':'Viernes Santo',
+  '2026-05-01':'Día del Trabajador','2026-05-25':'Revolución de Mayo',
+  '2026-06-15':'Paso a la Inmortalidad de Güemes (trasladado)','2026-06-20':'Día de la Bandera',
+  '2026-07-09':'Día de la Independencia','2026-07-10':'Feriado puente',
+  '2026-08-17':'Paso a la Inmortalidad de San Martín',
+  '2026-10-12':'Día del Respeto a la Diversidad Cultural',
+  // Noviembre 2026 - fechas agregadas
+  '2026-11-09':'Visita Papal',
+  '2026-11-16':'Día del Empleado Judicial',
+  '2026-11-23':'Día de la Soberanía Nacional (trasladado)',
+  '2026-12-07':'Feriado puente','2026-12-08':'Inmaculada Concepción',
+  '2026-12-25':'Navidad',
+  // 2027 (parcial)
+  '2027-01-01':'Año Nuevo'
+};
 
-            while (diasContados < plazoDias) {
-                const diaDeLaSemana = fecha.getDay();
-                if (diaDeLaSemana !== 0 && diaDeLaSemana !== 6) {
-                    diasContados++;
-                }
-                
-                if (diasContados < plazoDias) {
-                    fecha.setDate(fecha.getDate() + 1);
-                }
-            }
+const pad = n => String(n).padStart(2,'0');
+const key = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const esFinDeSemana = d => d.getDay()===0 || d.getDay()===6;
+const esInhabil = d => esFinDeSemana(d) || key(d) in FERIADOS;
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const fmt = d => cap(d.toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
 
-            const opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            const fechaVencimiento = new Date(fecha);
-            const fechaVencimientoStr = fechaVencimiento.toLocaleDateString('es-ES', opcionesFecha);
+const hint = document.getElementById('hint');
+function actualizarHint(){
+  const h = document.getElementById('c-habiles').checked;
+  hint.textContent = h
+    ? 'Se omiten sábados, domingos y feriados vigentes en Argentina.'
+    : 'Se cuentan todos los días. Si el último día es inhábil, el vencimiento pasa al primer día hábil siguiente.';
+}
+document.querySelectorAll('input[name=computo]').forEach(r=>r.addEventListener('change',actualizarHint));
+actualizarHint();
 
-            const fechaGracia = new Date(fechaVencimiento);
-            fechaGracia.setDate(fechaGracia.getDate() + 1);
-            while (fechaGracia.getDay() === 0 || fechaGracia.getDay() === 6) {
-                fechaGracia.setDate(fechaGracia.getDate() + 1);
-            }
-            const fechaGraciaStr = fechaGracia.toLocaleDateString('es-ES', opcionesFecha);
+function calcularPlazo(){
+  const fechaInput = document.getElementById('fechaNotificacion').value;
+  const plazo = parseInt(document.getElementById('plazoDias').value,10);
+  const tipo = document.getElementById('tipoEscrito').value.trim();
+  const norma = document.getElementById('normativa').value.trim();
+  const out = document.getElementById('resultado');
+  const habiles = document.getElementById('c-habiles').checked;
 
-            const horaVencimiento = '12:00 hs.';
-            const horaGracia = '08:59 hs.';
+  if(!fechaInput || isNaN(plazo) || plazo<=0){
+    out.innerHTML = '<p class="error">Ingrese una fecha y un plazo válidos.</p>';
+    return;
+  }
 
-            resultadoDiv.innerHTML = `
-                ${tipoEscrito ? `<p><strong>Tipo:</strong> ${tipoEscrito}</p>` : ''}
-                ${normativa ? `<p><strong>Normativa:</strong> ${normativa}</p>` : ''}
-                <hr>
-                <p>El plazo de <strong>${plazoDias}</strong> días hábiles vence el:</p>
-                <p><strong><span class="color-blue">${fechaVencimientoStr}</span></strong> a las <strong><span class="color-blue">${horaVencimiento}</span></strong></p>
-                <p>Plazo de Gracia:</p>
-                <p>Vence el <strong><span class="color-red">${fechaGraciaStr}</span></strong> a las <strong><span class="color-red">${horaGracia}</span></strong></p>
-            `;
-        }
-    </script>
+  const omitidos = [];
+  let f = new Date(fechaInput+'T00:00:00');
+  let contados = 0;
+
+  if(habiles){
+    while(contados<plazo){
+      f.setDate(f.getDate()+1);
+      if(esInhabil(f)){ if(key(f) in FERIADOS && !esFinDeSemana(f)) omitidos.push(f.getTime()); }
+      else contados++;
+    }
+  } else {
+    f.setDate(f.getDate()+plazo);
+    while(esInhabil(f)){
+      if(key(f) in FERIADOS && !esFinDeSemana(f)) omitidos.push(f.getTime());
+      f.setDate(f.getDate()+1);
+    }
+  }
+
+  const venc = new Date(f);
+  const gracia = new Date(venc);
+  do { gracia.setDate(gracia.getDate()+1); } while(esInhabil(gracia));
+
+  const feriadosTxt = omitidos.length
+    ? `<p class="nota">Feriados considerados: ${omitidos.map(t=>{const d=new Date(t);return `${d.getDate()}/${d.getMonth()+1} (${FERIADOS[key(d)]})`;}).join('; ')}.</p>`
+    : '';
+
+  out.style.color='var(--ink)';
+  out.innerHTML = `
+    ${tipo ? `<p class="meta"><strong>Tipo:</strong> ${esc(tipo)}</p>` : ''}
+    ${norma ? `<p class="meta"><strong>Normativa:</strong> ${esc(norma)}</p>` : ''}
+    ${(tipo||norma) ? '<hr>' : ''}
+    <p>Plazo de <strong>${plazo}</strong> días ${habiles?'hábiles judiciales':'corridos'}, vence el:</p>
+    <p><span class="fecha blue">${fmt(venc)}</span> a las <strong class="blue">12:00 hs.</strong></p>
+    <p class="lbl-r">Plazo de gracia</p>
+    <p>Vence el <span class="fecha red">${fmt(gracia)}</span> a las <strong class="red">08:59 hs.</strong></p>
+    ${feriadosTxt}`;
+}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+/* ============ VISOR INTEGRADO ============ */
+const visorFrame = document.getElementById('visorFrame');
+function abrirVisor(url,titulo){
+  document.getElementById('visorTitulo').textContent = titulo;
+  document.getElementById('visorExt').href = url;
+  if(visorFrame.getAttribute('src')!==url) visorFrame.src = url;
+  document.body.classList.add('en-visor');
+  window.scrollTo(0,0);
+  if(location.hash!=='#visor') history.pushState({visor:true},'','#visor');
+}
+function cerrarVisor(){
+  if(location.hash==='#visor'){ history.back(); } else { ocultarVisor(); }
+}
+function ocultarVisor(){ document.body.classList.remove('en-visor'); }
+document.querySelectorAll('[data-visor]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    if(e.ctrlKey||e.metaKey||e.shiftKey) return; // permite abrir en pestaña nueva
+    e.preventDefault();
+    abrirVisor(a.href,a.dataset.visor);
+  });
+});
+window.addEventListener('popstate',()=>{ if(location.hash!=='#visor') ocultarVisor(); });
+document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.body.classList.contains('en-visor')) cerrarVisor(); });
+if(location.hash==='#visor') history.replaceState(null,'',location.pathname+location.search);
+</script>
 </body>
 </html>
