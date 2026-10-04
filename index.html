@@ -3,212 +3,279 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calculadora de plazos procesales</title>
+<title>Legislación y Plazos Procesales</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#e9f1fb; --card:#fff; --ink:#1b2b44; --muted:#62748f;
-  --b50:#f3f8ff; --b100:#e3edfa; --b200:#cddff5; --b300:#a9c7ee;
-  --b500:#4a8bd9; --b600:#2f6fc4; --b800:#1f4e8c; --b900:#17396a;
+  --b50:#f3f8ff; --b100:#e3edfa; --b300:#a9c7ee; --b500:#4a8bd9; --b600:#2f6fc4; --b800:#1f4e8c; --b900:#17396a;
   --line:#d6e3f5; --red:#d92d4b;
+  --grad:linear-gradient(120deg,var(--b600),#5a9be0);
   --shadow:0 1px 2px rgba(23,57,106,.06),0 12px 36px rgba(47,111,196,.12);
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{
-  margin:0; padding:16px; min-height:100vh; min-height:100dvh;
-  font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif; color:var(--ink);
+  margin:0; min-height:100dvh; color:var(--ink);
+  font-family:'Plus Jakarta Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
   background:radial-gradient(900px 480px at 8% -8%,#d3e4fa 0,transparent 60%),var(--bg);
 }
-.main{display:grid; grid-template-columns:minmax(0,1fr); gap:16px; width:100%; max-width:1240px; margin:0 auto}
-.card{display:flex; flex-direction:column; min-height:0; background:var(--card); border-radius:20px; box-shadow:var(--shadow); overflow:hidden}
+button{font:inherit}
 
-/* Encabezado */
-.head{padding:20px 28px; color:#fff; background:linear-gradient(120deg,var(--b600),#5a9be0)}
-.head h1{margin:0; font-size:clamp(19px,2.2vw,24px); font-weight:800; letter-spacing:-.01em}
-.head p{margin:4px 0 0; font-size:13.5px; font-weight:500; color:#e3eefc}
+/* ===== Vistas: inicio · calculadora ===== */
+.vista{display:none}
+body[data-vista=inicio] #inicio,
+body[data-vista=calculadora] #calculadora{display:flex}
 
-/* Cuerpo: formulario + resultado */
-.body{flex:1; min-height:0; display:grid; grid-template-columns:minmax(0,1fr); gap:22px; padding:22px 28px 26px}
-.form,.res{min-height:0; display:flex; flex-direction:column}
+/* Botones */
+.btn{padding:12px 18px; border:0; border-radius:11px; font-size:14.5px; font-weight:700; cursor:pointer; transition:transform .15s, box-shadow .2s, background .2s, border-color .2s}
+.btn:focus-visible,.norma:focus-visible,.cta:focus-visible{outline:3px solid rgba(74,139,217,.55); outline-offset:2px}
+.btn-primary{flex:2; color:#fff; background:linear-gradient(135deg,var(--b500),var(--b600)); box-shadow:0 6px 16px rgba(47,111,196,.3)}
+.btn-primary:hover{transform:translateY(-1px)}
+.btn-ghost{flex:1; color:var(--b800); background:#fff; border:1.5px solid var(--line)}
+.btn-ghost:hover{background:var(--b50); border-color:var(--b500)}
+
+/* Barra superior de las vistas a pantalla completa */
+.bar{position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:12px; padding:12px 16px; color:#fff; background:var(--grad)}
+.bar h2{flex:1; margin:0; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.bar .btn{flex:none; padding:9px 15px; font-size:14px; border-radius:10px}
+.btn-back{background:#fff; color:var(--b800)}
+.btn-back:hover{background:var(--b100)}
+.btn-ext{display:inline-flex; align-items:center; color:#fff; text-decoration:none; background:rgba(255,255,255,.18)}
+.btn-ext:hover{background:rgba(255,255,255,.3)}
+
+/* ===== Inicio: encabezado + panel lateral + contenido ===== */
+html,body{overflow-x:hidden}
+#inicio{flex-direction:column; width:100%; height:100dvh; overflow:hidden}
+.hero{flex:none; display:flex; align-items:flex-start; justify-content:space-between; gap:12px; padding:clamp(10px,2vw,18px) clamp(12px,3vw,28px); color:#fff; background:var(--grad)}
+.hero h1{margin:0; min-width:0; font-size:clamp(17px,4.2vw,30px); font-weight:800; line-height:1.15; letter-spacing:-.01em}
+.hero p{margin:3px 0 0; font-size:clamp(11.5px,1.8vw,14px); font-weight:500; color:#e3eefc}
+.cta{flex:none; margin-left:auto; align-self:flex-start; padding:clamp(9px,1.6vw,14px) clamp(12px,2.4vw,24px); border:0; border-radius:12px; font-size:clamp(12.5px,1.8vw,15.5px); font-weight:800; color:var(--b800); background:#fff; cursor:pointer; box-shadow:0 6px 18px rgba(23,57,106,.25); transition:transform .15s, box-shadow .2s}
+.cta:hover{transform:translateY(-2px)}
+.shell{flex:1; min-height:0; display:grid; grid-template-columns:clamp(250px,26vw,340px) minmax(0,1fr)}
+.side{min-width:0; overflow-y:auto; padding:14px; background:var(--card); border-right:1px solid var(--line)}
+.side-t{margin:2px 4px 10px; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+.materia{margin-bottom:16px}
+.materia h2{margin:0 0 2px 4px; font-size:15px; font-weight:800; color:var(--b900)}
+.norma{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:7px; padding:11px 14px; text-decoration:none; font-size:14px; font-weight:600; line-height:1.3; color:var(--b900); background:var(--b50); border:1.5px solid var(--line); border-left:4px solid var(--b300); border-radius:12px; transition:background .2s, border-color .2s}
+.norma::after{content:''; flex:none; width:7px; height:7px; border:solid var(--b500); border-width:2px 2px 0 0; transform:rotate(45deg)}
+.norma:hover{background:#fff; border-color:var(--b500); border-left-color:var(--b600)}
+.norma.activa{background:var(--b100); border-color:var(--b500); border-left-color:var(--b600)}
+.content{min-width:0; min-height:0; display:flex; flex-direction:column}
+.cbar{flex:none; display:flex; align-items:center; gap:10px; padding:8px 12px; background:var(--b100); border-bottom:1px solid var(--line)}
+.cbar h2{flex:1; min-width:0; margin:0; font-size:clamp(13px,2vw,15.5px); font-weight:700; color:var(--b900); white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.cbar .btn{flex:none; padding:7px 12px; font-size:13px; border-radius:9px}
+.cbar .btn-ext{color:var(--b800); background:#fff; border:1.5px solid var(--line)}
+.cbar .btn-ext:hover{border-color:var(--b500)}
+.btn-menu{display:none; background:#fff; color:var(--b800); border:1.5px solid var(--line)}
+.cbody{flex:1; min-height:0; position:relative; background:#fff}
+.cbody iframe{position:absolute; inset:0; width:100%; height:100%; border:0; display:block}
+.vacio{height:100%; display:flex; align-items:center; justify-content:center; padding:24px; text-align:center; font-size:15px; color:var(--muted)}
+#inicio:not(.hay-norma) .cbar .btn-ext{display:none}
+@media (max-width:820px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  .btn-menu{display:inline-flex}
+  body[data-panel=lista] .content{display:none}
+  body[data-panel=norma] .side{display:none}
+  .hero p{display:none}
+}
+
+/* ===== Calculadora ===== */
+#calculadora{flex-direction:column; min-height:100dvh}
+.calc{flex:1; display:grid; grid-template-columns:minmax(0,1fr); gap:18px; width:100%; max-width:1100px; margin:0 auto; padding:18px 16px 24px}
+.panel{display:flex; flex-direction:column; padding:22px; background:var(--card); border-radius:20px; box-shadow:var(--shadow)}
 .field{margin-bottom:14px}
 label,.lbl{display:block; margin-bottom:6px; font-size:13px; font-weight:600; color:var(--b800)}
 input[type=date],input[type=number],input[type=text]{
   width:100%; padding:10px 13px; font:inherit; font-size:14.5px; color:var(--ink);
-  background:var(--b50); border:1.5px solid var(--line); border-radius:11px;
-  transition:border-color .2s, box-shadow .2s, background .2s;
+  background:var(--b50); border:1.5px solid var(--line); border-radius:11px; transition:border-color .2s, box-shadow .2s, background .2s;
 }
 input::placeholder{color:#8fa0ba}
 input:focus{outline:none; background:#fff; border-color:var(--b500); box-shadow:0 0 0 4px rgba(74,139,217,.18)}
 .row{display:grid; grid-template-columns:1fr 1fr; gap:14px}
 .seg{display:grid; grid-template-columns:1fr 1fr; gap:4px; padding:4px; background:var(--b100); border-radius:13px}
 .seg input{position:absolute; opacity:0; pointer-events:none}
-.seg label{margin:0; padding:9px 6px; text-align:center; font-size:13.5px; font-weight:700; color:var(--b800); border-radius:10px; cursor:pointer; transition:background .2s,color .2s,box-shadow .2s}
+.seg label{margin:0; padding:9px 6px; text-align:center; font-size:13.5px; font-weight:700; border-radius:10px; cursor:pointer; transition:background .2s, color .2s}
 .seg input:checked + label{background:#fff; color:var(--b600); box-shadow:0 2px 8px rgba(47,111,196,.18)}
 .seg input:focus-visible + label{outline:3px solid rgba(74,139,217,.45)}
-.hint{margin:7px 2px 0; font-size:12.5px; color:var(--muted); line-height:1.4}
+.hint{margin:7px 2px 0; font-size:12.5px; line-height:1.4; color:var(--muted)}
 .btns{display:flex; gap:10px; margin-top:auto; padding-top:6px}
-.btn{flex:1; padding:12px 18px; border:0; border-radius:11px; font:inherit; font-size:14.5px; font-weight:700; cursor:pointer; transition:transform .15s, box-shadow .2s, background .2s, border-color .2s}
-.btn:focus-visible{outline:3px solid rgba(74,139,217,.5); outline-offset:2px}
-.btn-primary{flex:2; color:#fff; background:linear-gradient(135deg,var(--b500),var(--b600)); box-shadow:0 6px 16px rgba(47,111,196,.3)}
-.btn-primary:hover{transform:translateY(-1px); box-shadow:0 9px 20px rgba(47,111,196,.36)}
-.btn-ghost{color:var(--b800); background:#fff; border:1.5px solid var(--line)}
-.btn-ghost:hover{background:var(--b50); border-color:var(--b500)}
-.btn:active{transform:translateY(0)}
 
-/* Resultado */
 .res-t{margin:0 0 8px; font-size:13px; font-weight:700; color:var(--b800)}
 #resultado{
-  flex:1; min-height:140px; overflow:auto; padding:18px 20px; border-radius:16px;
-  background:var(--b50); border:1.5px solid var(--line);
+  flex:1; min-height:180px; display:flex; flex-direction:column; justify-content:center; overflow:auto;
+  padding:18px 20px; border-radius:16px; background:var(--b50); border:1.5px solid var(--line);
   font-size:14.5px; line-height:1.5; text-align:center; color:var(--muted);
-  display:flex; flex-direction:column; justify-content:center;
 }
 #resultado p{margin:0 0 4px}
-#resultado .meta{color:var(--ink); font-size:13.5px; text-align:left}
-#resultado hr{width:100%; border:0; border-top:1px solid var(--line); margin:10px 0}
+#resultado .meta{font-size:13.5px; text-align:left; color:var(--ink)}
+#resultado hr{width:100%; margin:10px 0; border:0; border-top:1px solid var(--line)}
 .lbl-r{margin-top:12px !important; font-size:12.5px; font-weight:700; color:var(--muted)}
 .fecha{display:block; font-size:clamp(17px,1.7vw,20px); font-weight:800; letter-spacing:-.01em}
 .blue{color:var(--b600)} .red{color:var(--red)}
 .nota{margin-top:12px !important; font-size:12.5px; color:var(--muted)}
 .error{color:var(--red); font-weight:600}
 
-/* Normativa (columna derecha) */
-.side{display:flex; flex-direction:column; min-height:0; padding:18px; background:var(--card); border-radius:20px; box-shadow:var(--shadow)}
-.side h2{margin:0 0 12px 4px; font-size:14px; font-weight:800; color:var(--b900)}
-.modules{flex:1; min-height:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px}
-.module{
-  display:flex; flex-direction:column; justify-content:center; gap:2px; min-height:64px; padding:10px 16px;
-  text-decoration:none; color:var(--b900); font-weight:700; font-size:14.5px; line-height:1.25;
-  background:var(--b50); border:1.5px solid var(--line); border-left:4px solid var(--b300); border-radius:13px;
-  transition:background .2s, border-color .2s, transform .2s, box-shadow .2s;
-}
-.module small{font-size:12px; font-weight:500; color:var(--muted)}
-.module:hover{background:#fff; border-color:var(--b500); border-left-color:var(--b600); transform:translateX(3px); box-shadow:0 6px 16px rgba(47,111,196,.14)}
-.module:focus-visible{outline:3px solid rgba(74,139,217,.5); outline-offset:2px}
-
-/* Escritorio: todo en una sola pantalla, sin scroll */
-@media (min-width:1000px) and (min-height:560px){
-  body{height:100dvh; overflow:hidden; padding:20px}
-  .main{height:100%; grid-template-columns:minmax(0,1fr) 300px; grid-template-rows:minmax(0,1fr); gap:20px}
-  .body{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr)}
-  .modules{display:flex; flex-direction:column}
-  .module{flex:1}
-}
-@media (min-width:1000px) and (max-height:760px){
-  .head{padding:14px 24px} .body{padding:16px 24px 18px; gap:18px}
-  .field{margin-bottom:10px} .hint{font-size:12px; margin-top:5px}
-  input[type=date],input[type=number],input[type=text]{padding:8px 12px}
-  .btn{padding:10px 16px} .module{min-height:0; padding:8px 14px}
-  #resultado{padding:14px 16px}
-}
-
-/* Móvil */
+@media (min-width:900px){ .calc{grid-template-columns:minmax(0,1.05fr) minmax(0,1fr); padding:24px 20px 28px} }
 @media (max-width:560px){
-  body{padding:10px} .head{padding:18px 18px} .body{padding:18px}
+  .calc{padding:12px 10px 18px} .panel{padding:18px}
   .row{grid-template-columns:1fr} .btns{flex-direction:column}
-  .side{padding:14px} .modules{grid-template-columns:1fr}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
-
 @media print{
-  body{background:#fff; padding:0; height:auto; overflow:visible}
-  .main{display:block; height:auto} .side,.field,.btns,.hint,.head p,.res-t{display:none}
-  .card{box-shadow:none} .head{background:none; color:#000; padding:0 0 12px}
-  .body{display:block; padding:0} #resultado{border:0; background:none; padding:0; overflow:visible}
+  body{background:#fff} .bar,.form{display:none !important}
+  .calc{display:block; padding:0} .panel{padding:0; box-shadow:none}
+  #resultado{overflow:visible; border:0; background:none; padding:0}
   .blue{color:#2f6fc4 !important} .red{color:#d92d4b !important}
 }
-
-/* Visor integrado */
-.visor{display:none; flex-direction:column; width:100%; max-width:1240px; margin:0 auto; height:calc(100vh - 32px); height:calc(100dvh - 32px); background:#fff; border-radius:20px; overflow:hidden; box-shadow:var(--shadow)}
-body.en-visor .main{display:none}
-body.en-visor .visor{display:flex}
-.visor-bar{display:flex; align-items:center; gap:12px; padding:12px 16px; background:linear-gradient(120deg,var(--b600),#5a9be0); color:#fff}
-.visor-bar h2{flex:1; margin:0; font-size:16px; font-weight:700; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
-.visor-bar .btn{flex:none; padding:9px 15px; font-size:14px; border-radius:10px}
-.visor-bar .btn-back{background:#fff; color:var(--b800)}
-.visor-bar .btn-back:hover{background:var(--b100)}
-.visor-bar .btn-ext{background:rgba(255,255,255,.18); color:#fff; text-decoration:none; display:inline-flex; align-items:center}
-.visor-bar .btn-ext:hover{background:rgba(255,255,255,.3)}
-.visor iframe{flex:1; width:100%; border:0; background:#fff}
-@media (min-width:1000px) and (min-height:560px){.visor{height:calc(100dvh - 40px)}}
-@media (max-width:600px){.visor-bar .btn-ext{display:none} body{padding:10px} .visor{height:calc(100dvh - 20px); border-radius:16px}}
-@media print{.visor{display:none !important}}
 </style>
 </head>
-<body>
-<div class="main">
-  <div class="card">
-    <header class="head">
-      <h1>Calculadora de plazos procesales</h1>
-      <p>Defensoría Civil y Comercial 6</p>
-    </header>
-    <div class="body">
-      <section class="form" aria-label="Datos del plazo">
-        <div class="field">
-          <span class="lbl">Cómputo del plazo</span>
-          <div class="seg" role="radiogroup" aria-label="Tipo de cómputo">
-            <input type="radio" name="computo" id="c-habiles" value="habiles" checked>
-            <label for="c-habiles">Días hábiles judiciales</label>
-            <input type="radio" name="computo" id="c-corridos" value="corridos">
-            <label for="c-corridos">Días corridos</label>
-          </div>
-          <p class="hint" id="hint"></p>
-        </div>
-        <div class="row">
-          <div class="field">
-            <label for="fechaNotificacion">Fecha de notificación</label>
-            <input type="date" id="fechaNotificacion">
-          </div>
-          <div class="field">
-            <label for="plazoDias">Plazo en días</label>
-            <input type="number" id="plazoDias" min="1" value="5">
-          </div>
-        </div>
-        <div class="field">
-          <label for="tipoEscrito">Tipo de escrito / resolución / sentencia</label>
-          <input type="text" id="tipoEscrito" placeholder="Ej: Contestación de demanda, Recurso de apelación">
-        </div>
-        <div class="field">
-          <label for="normativa">Normativa de referencia aplicable</label>
-          <input type="text" id="normativa" placeholder="Ej: Art. 347 del C.P.C.C. de Misiones">
-        </div>
-        <div class="btns">
-          <button class="btn btn-primary" onclick="calcularPlazo()">Calcular vencimiento</button>
-          <button class="btn btn-ghost" onclick="window.print()">Imprimir</button>
-        </div>
-      </section>
-      <section class="res" aria-label="Resultado">
-        <h2 class="res-t">Resultado</h2>
-        <div id="resultado" aria-live="polite"><p>El resultado del cálculo aparecerá aquí.</p></div>
-      </section>
+<body data-vista="inicio">
+
+<!-- ===== INICIO ===== -->
+<main class="vista" id="inicio">
+  <header class="hero">
+    <div>
+      <h1>Legislación y Plazos Procesales</h1>
+      <p>Plazos procesales y normativa de consulta</p>
     </div>
-  </div>
-
-  <aside class="side">
-    <h2>Normativa</h2>
-    <nav class="modules" aria-label="Normativa">
-      <a class="module" href="https://admindefensoria6.github.io/CodigoCivilComercial/" target="_blank" rel="noopener" data-visor="Código Civil y Comercial">Código Civil y Comercial<small>Consultar texto</small></a>
-      <a class="module" href="https://defensorialocal-seis.github.io/LEYmisiones/" target="_blank" rel="noopener" data-visor="Ley XII-27 CCyCFVF Misiones">Ley XII-27 CCyCFVF Misiones<small>Consultar texto</small></a>
-      <a class="module" href="https://defensorialocal-seis.github.io/CPCCN/" target="_blank" rel="noopener" data-visor="C.P.C.C. de la Nación">C.P.C.C. de la Nación<small>Consultar texto</small></a>
-      <a class="module" href="https://defensorialocal-seis.github.io/ayuda-plazos/CodigoFiscalMisiones" target="_blank" rel="noopener" data-visor="Código Fiscal de Misiones">Código Fiscal de Misiones<small>Consultar texto</small></a>
-      <a class="module" href="https://defensorialocal-seis.github.io/ayuda-plazos/LeyOrganicaPJ" target="_blank" rel="noopener" data-visor="Ley Orgánica del Poder Judicial">Ley Orgánica del Poder Judicial<small>Consultar texto</small></a>
-      <a class="module" href="https://defensorialocal-seis.github.io/ayuda-plazos/RPJ" target="_blank" rel="noopener" data-visor="Reglamento para el Poder Judicial">Reglamento para el Poder Judicial<small>Consultar texto</small></a>
+    <button class="cta" type="button" onclick="ir('calculadora')">Calcular Plazos Procesales</button>
+  </header>
+  <div class="shell">
+    <nav class="side" aria-label="Normativa por materia">
+      <p class="side-t">Normativa por materia</p>
+      <div id="materias"></div>
     </nav>
-  </aside>
-</div>
+    <section class="content" aria-label="Contenido de la norma">
+      <div class="cbar">
+        <button class="btn btn-menu" type="button" onclick="verLista()">☰ Normativa</button>
+        <h2 id="visorTitulo">Seleccione una norma</h2>
+        <a class="btn btn-ext" id="visorExt" href="#" target="_blank" rel="noopener">Abrir en pestaña nueva</a>
+      </div>
+      <div class="cbody" id="cbody"><div class="vacio">Elija una norma del panel izquierdo para ver su contenido completo aquí.</div></div>
+    </section>
+  </div>
+</main>
 
-<section class="visor" id="visor" aria-label="Visor de normativa">
-  <div class="visor-bar">
-    <button class="btn btn-back" type="button" onclick="cerrarVisor()">← Volver a la calculadora</button>
-    <h2 id="visorTitulo"></h2>
-    <a class="btn btn-ext" id="visorExt" href="#" target="_blank" rel="noopener">Abrir en pestaña nueva</a>
+<!-- ===== CALCULADORA (pantalla completa) ===== -->
+<section class="vista" id="calculadora" aria-label="Calculadora de plazos procesales">
+  <div class="bar">
+    <button class="btn btn-back" type="button" onclick="volver()">← Inicio</button>
+    <h2>Calculadora de plazos procesales</h2>
+  </div>
+  <div class="calc">
+    <section class="panel form" aria-label="Datos del plazo">
+      <div class="field">
+        <span class="lbl">Cómputo del plazo</span>
+        <div class="seg" role="radiogroup" aria-label="Tipo de cómputo">
+          <input type="radio" name="computo" id="c-habiles" value="habiles" checked>
+          <label for="c-habiles">Días hábiles judiciales</label>
+          <input type="radio" name="computo" id="c-corridos" value="corridos">
+          <label for="c-corridos">Días corridos</label>
+        </div>
+        <p class="hint" id="hint"></p>
+      </div>
+      <div class="row">
+        <div class="field">
+          <label for="fechaNotificacion">Fecha de notificación</label>
+          <input type="date" id="fechaNotificacion">
+        </div>
+        <div class="field">
+          <label for="plazoDias">Plazo en días</label>
+          <input type="number" id="plazoDias" min="1" value="5">
+        </div>
+      </div>
+      <div class="field">
+        <label for="tipoEscrito">Tipo de escrito / resolución / sentencia</label>
+        <input type="text" id="tipoEscrito" placeholder="Ej: Contestación de demanda, Recurso de apelación">
+      </div>
+      <div class="field">
+        <label for="normativa">Normativa de referencia aplicable</label>
+        <input type="text" id="normativa" placeholder="Ej: Art. 347 del C.P.C.C. de Misiones">
+      </div>
+      <div class="btns">
+        <button class="btn btn-primary" type="button" onclick="calcularPlazo()">Calcular vencimiento</button>
+        <button class="btn btn-ghost" type="button" onclick="window.print()">Imprimir</button>
+      </div>
+    </section>
+    <section class="panel" aria-label="Resultado">
+      <h3 class="res-t">Resultado</h3>
+      <div id="resultado" aria-live="polite"><p>El resultado del cálculo aparecerá aquí.</p></div>
+    </section>
   </div>
 </section>
 
 <script>
+/* ============ NORMATIVA POR MATERIA ============
+   Editar aquí para agregar, quitar o mover normas entre tarjetas: ['Nombre', 'URL'] */
+const AP = 'https://defensorialocal-seis.github.io/ayuda-plazos/';
+const MATERIAS = [
+  { titulo:'Procesal', normas:[
+    ['Ley XII-27 CCyCFVF Misiones','https://defensorialocal-seis.github.io/LEYmisiones/'],
+    ['C.P.C.C. de la Nación','https://defensorialocal-seis.github.io/CPCCN/'],
+    ['Código Procedimiento Laboral de Misiones', AP+'cplmisiones'],
+    ['Código Procedimiento Penal de Misiones', AP+'cppmisiones']
+  ]},
+  { titulo:'Civil y Comercial', normas:[
+    ['Código Civil y Comercial','https://admindefensoria6.github.io/CodigoCivilComercial/']
+  ]},
+  { titulo:'Fiscal y Tributario', normas:[
+    ['Código Fiscal de Misiones', AP+'CodigoFiscalMisiones']
+  ]},
+  { titulo:'Poder Judicial', normas:[
+    ['Ley Orgánica del Poder Judicial', AP+'LeyOrganicaPJ'],
+    ['Reglamento para el Poder Judicial', AP+'RPJ']
+  ]},
+  { titulo:'Penal', normas:[
+    ['Código Penal Argentino', AP+'C%C3%B3digoPenal'],
+    ['Régimen Penal Juvenil', AP+'RegimenPenalJuvenil']
+  ]}
+];
+
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+
+const contMaterias = document.getElementById('materias');
+contMaterias.innerHTML = MATERIAS.map(m => `
+  <section class="materia">
+    <h2>${esc(m.titulo)}</h2>
+    ${m.normas.map(([n,u]) => `<a class="norma" href="${u}" target="_blank" rel="noopener" data-visor="${esc(n)}">${esc(n)}</a>`).join('')}
+  </section>`).join('');
+
+/* ============ NAVEGACIÓN ============ */
+document.body.dataset.panel = 'lista';          // móvil: 'lista' (panel) o 'norma' (contenido)
+function mostrar(v){ document.body.dataset.vista = v; window.scrollTo(0,0); }
+function ir(v){ mostrar(v); try{ history.pushState({v},'','#'+v); }catch(e){ vistaPrevia=true; } }
+function volver(){
+  if(!vistaPrevia && location.hash){ try{ history.back(); return; }catch(e){} }
+  mostrar('inicio');
+}
+let vistaPrevia = false;
+function verLista(){ document.body.dataset.panel = 'lista'; }
+
+function abrirNorma(url,titulo,a){
+  const cb = document.getElementById('cbody');
+  cb.innerHTML = '';
+  const f = document.createElement('iframe');
+  f.title = titulo; f.src = url;
+  cb.appendChild(f);
+  document.getElementById('visorTitulo').textContent = titulo;
+  document.getElementById('visorExt').href = url;
+  document.getElementById('inicio').classList.add('hay-norma');
+  contMaterias.querySelectorAll('.norma').forEach(x=>x.classList.toggle('activa', x===a));
+  document.body.dataset.panel = 'norma';
+}
+contMaterias.addEventListener('click', e=>{
+  const a = e.target.closest('a[data-visor]');
+  if(!a || e.ctrlKey || e.metaKey || e.shiftKey) return;   // permite abrir en pestaña nueva
+  e.preventDefault();
+  abrirNorma(a.href, a.dataset.visor, a);
+});
+window.addEventListener('popstate', ()=> mostrar(location.hash==='#calculadora' ? 'calculadora' : 'inicio'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && document.body.dataset.vista==='calculadora') volver(); });
+try{ if(location.hash) history.replaceState(null,'',location.pathname+location.search); }catch(e){}
+
 /* ============ FERIADOS Y DÍAS INHÁBILES (formato AAAA-MM-DD) ============
    Editar aquí para agregar o quitar fechas. Verificar contra el calendario oficial. */
 const FERIADOS = {
@@ -232,17 +299,18 @@ const FERIADOS = {
   '2027-01-01':'Año Nuevo'
 };
 
+/* ============ CÁLCULO DE PLAZOS ============ */
 const pad = n => String(n).padStart(2,'0');
 const key = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
 const esFinDeSemana = d => d.getDay()===0 || d.getDay()===6;
 const esInhabil = d => esFinDeSemana(d) || key(d) in FERIADOS;
+const esFeriadoLaboral = d => key(d) in FERIADOS && !esFinDeSemana(d);
 const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
 const fmt = d => cap(d.toLocaleDateString('es-AR',{weekday:'long',year:'numeric',month:'long',day:'numeric'}));
 
 const hint = document.getElementById('hint');
 function actualizarHint(){
-  const h = document.getElementById('c-habiles').checked;
-  hint.textContent = h
+  hint.textContent = document.getElementById('c-habiles').checked
     ? 'Se omiten sábados, domingos y feriados vigentes en Argentina.'
     : 'Se cuentan todos los días. Si el último día es inhábil, el vencimiento pasa al primer día hábil siguiente.';
 }
@@ -263,19 +331,19 @@ function calcularPlazo(){
   }
 
   const omitidos = [];
-  let f = new Date(fechaInput+'T00:00:00');
+  const f = new Date(fechaInput+'T00:00:00');
   let contados = 0;
 
   if(habiles){
     while(contados<plazo){
       f.setDate(f.getDate()+1);
-      if(esInhabil(f)){ if(key(f) in FERIADOS && !esFinDeSemana(f)) omitidos.push(f.getTime()); }
+      if(esInhabil(f)){ if(esFeriadoLaboral(f)) omitidos.push(f.getTime()); }
       else contados++;
     }
   } else {
     f.setDate(f.getDate()+plazo);
     while(esInhabil(f)){
-      if(key(f) in FERIADOS && !esFinDeSemana(f)) omitidos.push(f.getTime());
+      if(esFeriadoLaboral(f)) omitidos.push(f.getTime());
       f.setDate(f.getDate()+1);
     }
   }
@@ -288,7 +356,7 @@ function calcularPlazo(){
     ? `<p class="nota">Feriados considerados: ${omitidos.map(t=>{const d=new Date(t);return `${d.getDate()}/${d.getMonth()+1} (${FERIADOS[key(d)]})`;}).join('; ')}.</p>`
     : '';
 
-  out.style.color='var(--ink)';
+  out.style.color = 'var(--ink)';
   out.innerHTML = `
     ${tipo ? `<p class="meta"><strong>Tipo:</strong> ${esc(tipo)}</p>` : ''}
     ${norma ? `<p class="meta"><strong>Normativa:</strong> ${esc(norma)}</p>` : ''}
@@ -299,46 +367,6 @@ function calcularPlazo(){
     <p>Vence el <span class="fecha red">${fmt(gracia)}</span> a las <strong class="red">08:59 hs.</strong></p>
     ${feriadosTxt}`;
 }
-function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-
-/* ============ VISOR INTEGRADO ============ */
-const visor = document.getElementById('visor');
-/* Cada normativa se abre en un iframe nuevo y al cerrar se elimina, para que el
-   historial interno de la normativa anterior nunca afecte a "Volver". */
-function destruirFrame(){
-  const f = document.getElementById('visorFrame');
-  if(f) f.remove();
-}
-function abrirVisor(url,titulo){
-  destruirFrame();
-  const f = document.createElement('iframe');
-  f.id = 'visorFrame'; f.title = 'Contenido';
-  visor.appendChild(f);
-  f.src = url;
-  document.getElementById('visorTitulo').textContent = titulo;
-  document.getElementById('visorExt').href = url;
-  document.body.classList.add('en-visor');
-  window.scrollTo(0,0);
-  if(location.hash!=='#visor') history.pushState({visor:true},'','#visor');
-}
-function cerrarVisor(){
-  ocultarVisor();                       // siempre vuelve a la pantalla principal
-  if(location.hash==='#visor') history.back();
-}
-function ocultarVisor(){
-  document.body.classList.remove('en-visor');
-  destruirFrame();
-}
-document.querySelectorAll('[data-visor]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    if(e.ctrlKey||e.metaKey||e.shiftKey) return; // permite abrir en pestaña nueva
-    e.preventDefault();
-    abrirVisor(a.href,a.dataset.visor);
-  });
-});
-window.addEventListener('popstate',()=>{ if(location.hash!=='#visor') ocultarVisor(); });
-document.addEventListener('keydown',e=>{ if(e.key==='Escape' && document.body.classList.contains('en-visor')) cerrarVisor(); });
-if(location.hash==='#visor') history.replaceState(null,'',location.pathname+location.search);
 </script>
 </body>
 </html>
