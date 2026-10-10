@@ -57,8 +57,21 @@ html,body{overflow-x:hidden}
 .shell{flex:1; min-height:0; display:grid; grid-template-columns:clamp(250px,26vw,340px) minmax(0,1fr)}
 .side{min-width:0; overflow-y:auto; padding:14px; background:var(--card); border-right:1px solid var(--line)}
 .side-t{margin:2px 4px 10px; font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
-.materia{margin-bottom:16px}
-.materia h2{margin:0 0 2px 4px; font-size:15px; font-weight:800; color:var(--b900)}
+.buscar{position:relative; margin:0 0 12px}
+.buscar input{padding-right:40px}
+.buscar-x{position:absolute; right:6px; top:50%; transform:translateY(-50%); width:28px; height:28px; padding:0; border:0; border-radius:8px; background:transparent; color:var(--muted); font-size:19px; line-height:1; cursor:pointer}
+.buscar-x:hover{background:var(--b100); color:var(--b800)}
+.buscar-x[hidden]{display:none}
+.materia{margin-bottom:8px}
+.materia[hidden],.mat-lista[hidden],.norma[hidden],.sin-res[hidden]{display:none}
+.materia h2{margin:0; font-size:15px; font-weight:800; color:var(--b900)}
+.mat-btn{display:flex; align-items:center; justify-content:space-between; gap:10px; width:100%; padding:11px 14px; text-align:left; font-size:15px; font-weight:800; line-height:1.3; color:var(--b900); background:var(--b100); border:1.5px solid var(--line); border-radius:12px; cursor:pointer; transition:background .2s, border-color .2s}
+.mat-btn::after{content:''; flex:none; width:8px; height:8px; margin-top:-4px; border:solid var(--b600); border-width:0 2px 2px 0; transform:rotate(45deg); transition:transform .2s}
+.mat-btn[aria-expanded=true]::after{margin-top:4px; transform:rotate(-135deg)}
+.mat-btn:hover{background:#fff; border-color:var(--b500)}
+.mat-btn:focus-visible{outline:3px solid rgba(74,139,217,.55); outline-offset:2px}
+.mat-lista{padding:0 0 4px 8px}
+.sin-res{margin:8px 4px; font-size:13.5px; line-height:1.4; color:var(--muted)}
 .norma{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:7px; padding:11px 14px; text-decoration:none; font-size:14px; font-weight:600; line-height:1.3; color:var(--b900); background:var(--b50); border:1.5px solid var(--line); border-left:4px solid var(--b300); border-radius:12px; transition:background .2s, border-color .2s}
 .norma::after{content:''; flex:none; width:7px; height:7px; border:solid var(--b500); border-width:2px 2px 0 0; transform:rotate(45deg)}
 .norma:hover{background:#fff; border-color:var(--b500); border-left-color:var(--b600)}
@@ -146,7 +159,12 @@ input:focus{outline:none; background:#fff; border-color:var(--b500); box-shadow:
   <div class="shell">
     <nav class="side" aria-label="Normativa por materia">
       <p class="side-t">Normativa por materia</p>
+      <div class="buscar">
+        <input type="text" id="buscaNorma" placeholder="Buscar en la normativa…" aria-label="Buscar en la normativa" autocomplete="off">
+        <button type="button" class="buscar-x" id="buscaLimpiar" aria-label="Borrar búsqueda" hidden>×</button>
+      </div>
       <div id="materias"></div>
+      <p class="sin-res" id="sinRes" role="status" hidden>No se encontró normativa con ese texto.</p>
     </nav>
     <section class="content" aria-label="Contenido de la norma">
       <div class="cbar">
@@ -211,6 +229,7 @@ input:focus{outline:none; background:#fff; border-color:var(--b500); box-shadow:
 /* ============ NORMATIVA POR MATERIA ============
    Editar aquí para agregar, quitar o mover normas entre tarjetas: ['Nombre', 'URL'] */
 const AP = 'https://defensorialocal-seis.github.io/ayuda-plazos/';
+const SD = 'https://sistemadigital.github.io/ingreso-sistema/';
 const MATERIAS = [
   { titulo:'Civil y Comercial', normas:[
     ['Código Civil y Comercial','https://admindefensoria6.github.io/CodigoCivilComercial/']
@@ -237,17 +256,68 @@ const MATERIAS = [
     ['C.P.C.C. de la Nación','https://defensorialocal-seis.github.io/CPCCN/'],
     ['Código Procedimiento Laboral de Misiones', AP+'cplmisiones'],
     ['Código Procedimiento Penal de Misiones', AP+'cppmisiones']
+  ]},
+  { titulo:'Protección de personas', normas:[
+    ['Ley de Salud Mental', SD+'ley-salud-mental'],
+    ['Ley sobre Discapacidad', SD+'discapacidad'],
+    ['Protección de Niños, Niñas y Adolescentes', SD+'proteccionNNyA']
+  ]},
+  { titulo:'Violencia Familiar', normas:[
+    ['Ley XIV – N.º 6 · Antes Ley 3325', SD+'ley-violencia-familiar']
   ]}
 ];
 
 function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 
 const contMaterias = document.getElementById('materias');
-contMaterias.innerHTML = MATERIAS.map(m => `
+contMaterias.innerHTML = MATERIAS.map((m,i) => `
   <section class="materia">
-    <h2>${esc(m.titulo)}</h2>
-    ${m.normas.map(([n,u]) => `<a class="norma" href="${u}" target="_blank" rel="noopener" data-visor="${esc(n)}">${esc(n)}</a>`).join('')}
+    <h2><button type="button" class="mat-btn" id="mb${i}" aria-expanded="false" aria-controls="ml${i}">${esc(m.titulo)}</button></h2>
+    <div class="mat-lista" id="ml${i}" hidden>
+      ${m.normas.map(([n,u]) => `<a class="norma" href="${u}" target="_blank" rel="noopener" data-visor="${esc(n)}">${esc(n)}</a>`).join('')}
+    </div>
   </section>`).join('');
+
+/* Despliegue por materia: al pulsar el título se abre/cierra su listado */
+function abrirMateria(sec, abrir){
+  sec.querySelector('.mat-btn').setAttribute('aria-expanded', abrir);
+  sec.querySelector('.mat-lista').hidden = !abrir;
+}
+contMaterias.addEventListener('click', e=>{
+  const b = e.target.closest('.mat-btn');
+  if(!b) return;
+  const sec = b.closest('.materia');
+  abrirMateria(sec, b.getAttribute('aria-expanded') !== 'true');
+});
+
+/* Filtro de búsqueda: sin tildes ni mayúsculas; todas las palabras deben aparecer en el título
+   de la norma o de su materia. Durante la búsqueda se despliegan las materias con coincidencias. */
+const buscaIn = document.getElementById('buscaNorma');
+const buscaX = document.getElementById('buscaLimpiar');
+const sinRes = document.getElementById('sinRes');
+const normTxt = s => s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+function filtrar(){
+  const q = normTxt(buscaIn.value).split(/\s+/).filter(Boolean);
+  buscaX.hidden = !buscaIn.value;
+  let hallados = 0;
+  contMaterias.querySelectorAll('.materia').forEach(sec=>{
+    const mat = normTxt(sec.querySelector('.mat-btn').textContent);
+    let vis = 0;
+    sec.querySelectorAll('.norma').forEach(a=>{
+      const ok = q.every(t => (mat+' '+normTxt(a.dataset.visor)).includes(t));
+      a.hidden = !ok;
+      if(ok) vis++;
+    });
+    hallados += vis;
+    sec.hidden = vis === 0;
+    if(q.length) abrirMateria(sec, vis > 0);
+    else abrirMateria(sec, !!sec.querySelector('.norma.activa'));   // sin búsqueda: todo plegado salvo la norma abierta
+  });
+  sinRes.hidden = hallados > 0;
+}
+buscaIn.addEventListener('input', filtrar);
+buscaIn.addEventListener('keydown', e=>{ if(e.key==='Escape' && buscaIn.value){ buscaIn.value=''; filtrar(); } });
+buscaX.addEventListener('click', ()=>{ buscaIn.value=''; filtrar(); buscaIn.focus(); });
 
 /* ============ NAVEGACIÓN ============ */
 document.body.dataset.panel = 'lista';          // móvil: 'lista' (panel) o 'norma' (contenido)
